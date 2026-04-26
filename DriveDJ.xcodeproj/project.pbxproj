@@ -6,13 +6,8 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		CEE476D22F9E56ED00ADFD24 /* .gitignore in Sources */ = {isa = PBXBuildFile; fileRef = CEE476D12F9E56E400ADFD24 /* .gitignore */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
 		CEE4766D2F9E170900ADFD24 /* DriveDJ.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DriveDJ.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		CEE476D12F9E56E400ADFD24 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -37,7 +32,6 @@
 		CEE476642F9E170900ADFD24 = {
 			isa = PBXGroup;
 			children = (
-				CEE476D12F9E56E400ADFD24 /* .gitignore */,
 				CEE4766F2F9E170900ADFD24 /* DriveDJ */,
 				CEE4766E2F9E170900ADFD24 /* Products */,
 			);
@@ -125,7 +119,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEE476D22F9E56ED00ADFD24 /* .gitignore in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
