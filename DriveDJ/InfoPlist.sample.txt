@@ -1,0 +1,13 @@
+Add these entries to your app's Info.plist:
+
+- NSAppleMusicUsageDescription = "DriveDJ needs access to Apple Music to search and play songs."
+- CFBundleURLTypes = your Spotify redirect scheme, matching the redirect URI you set in AppConfig
+- UIBackgroundModes includes "audio"
+- CarPlay scene configuration for the CPTemplateApplicationSceneDelegate class named "CarPlaySceneDelegate"
+- Any CarPlay audio entitlement configuration requested from Apple
+- WeatherKit capability enabled for the App ID and provisioning profile used by the app
+
+Example scene configuration notes:
+- The CarPlay scene must point to the CarPlaySceneDelegate class
+- CarPlay apps must request the entitlement from Apple for the category they implement
+- WeatherKit requests require the WeatherKit capability in the developer portal and Xcode signing setup

@@ -1,0 +1,106 @@
+# =========================
+# Xcode
+# =========================
+
+# Build
+build/
+DerivedData/
+
+# Xcode user data
+*.xcuserstate
+*.xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# SwiftPM
+.build/
+Package.resolved
+
+# Playground
+timeline.xctimeline
+playground.xcworkspace
+
+# =========================
+# macOS
+# =========================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# =========================
+# Logs
+# =========================
+
+*.log
+
+# =========================
+# Temporary files
+# =========================
+
+*.swp
+*.tmp
+
+# =========================
+# Environment / Secrets
+# =========================
+
+# API Keysなど
+.env
+.env.*
+Secrets.plist
+Config.plist
+
+# =========================
+# API / Tokens
+# =========================
+
+# Spotifyトークンなど（重要）
+spotify_token.json
+token.json
+
+# =========================
+# Cache / Local data
+# =========================
+
+# アプリ内キャッシュ
+cache/
+*.cache
+*.db
+
+# 保存データ
+data/
+local_data/
+
+# =========================
+# CocoaPods（使ってる場合）
+# =========================
+
+Pods/
+Podfile.lock
+
+# =========================
+# Carthage（使ってる場合）
+# =========================
+
+Carthage/Build/
+
+# =========================
+# Fastlane（使ってる場合）
+# =========================
+
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# =========================
+# Archives
+# =========================
+
+*.xcarchive
+
+# =========================
+# Misc
+# =========================
+
+*.orig
