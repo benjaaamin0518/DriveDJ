@@ -8,11 +8,11 @@ final class DriveDJViewModel: ObservableObject {
     @Published var currentTrack: TrackRecord?
     @Published var upcomingTracks: [TrackRecord] = []
     @Published var isBusy: Bool = false
+    static var debugText: String = ""
 
     var session = DriveSessionManager.shared
 
-    private let orchestrator = DriveDJOrchestrator()
-
+    private lazy var orchestrator = DriveDJOrchestrator(viewModel:self)
     func bootstrap() async throws{
         isBusy = true
         defer { isBusy = false }
@@ -52,7 +52,18 @@ final class DriveDJViewModel: ObservableObject {
             snapshot.status = "No candidate tracks"
         }
     }
+    
+    func addSetList(track:TrackRecord) async throws{
+        upcomingTracks.append(track)
+        snapshot.queueCount = upcomingTracks.count
 
+        snapshot.status = "Prepared \(snapshot.queueCount) tracks"
+    }
+    func changeCurrentTrack(track:TrackRecord) {
+        currentTrack = track
+        snapshot.currentTitle = track.title
+        snapshot.currentArtist = track.artist
+    }
     func playPreparedSetlist() async {
         isBusy = true
         defer { isBusy = false }

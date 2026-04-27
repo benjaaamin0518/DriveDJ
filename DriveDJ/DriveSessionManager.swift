@@ -33,6 +33,7 @@ final class DriveSessionManager: NSObject, ObservableObject {
         locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
         locationManager.activityType = .automotiveNavigation
         locationManager.requestWhenInUseAuthorization()
+        locationManager.startUpdatingLocation()
     }
 
     var remainingMinutes: Double {
@@ -128,11 +129,12 @@ final class DriveSessionManager: NSObject, ObservableObject {
     }
 
     private func refreshCityDensity(for location: CLLocation) {
+        print("Test")
         if geocoder.isGeocoding {
             return
         }
 
-        if let lastGeocodeAt, Date().timeIntervalSince(lastGeocodeAt) < 300 {
+        if let lastGeocodeAt, Date().timeIntervalSince(lastGeocodeAt) < 59 {
             return
         }
 
@@ -142,7 +144,7 @@ final class DriveSessionManager: NSObject, ObservableObject {
             let placemark = placemarks?.first
             let hasUrbanPlacemark = placemark?.locality != nil || placemark?.subLocality != nil
             let hasRoad = placemark?.thoroughfare != nil
-
+            print(placemark?.locality, placemark?.subLocality, placemark?.thoroughfare)
             Task { @MainActor in
                 self.cityDensity = hasUrbanPlacemark ? 0.70 : (hasRoad ? 0.45 : 0.20)
             }
@@ -255,17 +257,19 @@ final class DriveSessionManager: NSObject, ObservableObject {
 
         for item in tracks {
             let title = item.name
+            let id = item.id
             let artist = item.artists.first?.name ?? ""
 
-            let appleId = try await findAppleMusicId(title: title, artist: artist)
+            //let appleId = try await findAppleMusicId(title: title, artist: artist)
 
-            if let appleId {
+            //if let appleId {
                 return TrackRecord(
                     title: title,
                     artist: artist,
+                    spotifyID: id,
                     tags: [],
                 )
-            }
+            //}
         }
 
         return nil
@@ -275,13 +279,14 @@ final class DriveSessionManager: NSObject, ObservableObject {
 extension DriveSessionManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
+        print("📍 location:", location.coordinate.latitude, location.coordinate.longitude, location.speed)
         updateDerivedMetrics(for: location)
         refreshCityDensity(for: location)
         refreshWeatherIfNeeded(for: location)
         refreshNightFlag()
     }
-
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        print("🔥 authorization changed:", manager.authorizationStatus.rawValue)
         if manager.authorizationStatus == .authorizedWhenInUse || manager.authorizationStatus == .authorizedAlways {
             startLocationUpdatesIfAuthorized()
         }

@@ -4,7 +4,8 @@ import Combine
 actor LibraryStore {
     private let fileName = "track-library.json"
     private var cache: [TrackRecord] = []
-    //let snapshot = PlaybackSnapshot()
+    private var snapshot = PlaybackSnapshot()
+    private let moodEngine = MoodEngine()
     //private let viewModel = DriveDJViewModel()
     var session = DriveSessionManager.shared
     
@@ -18,15 +19,20 @@ actor LibraryStore {
 //            cache = loaded
 //            return loaded
 //        }
-         var orchestrator = DriveDJOrchestrator()
-         let state = await session.currentState()
-         cache = Self.defaultSeedTracks()
+        // var orchestrator = DriveDJOrchestrator()
+         
+         //cache = Self.defaultSeedTracks()
          await MainActor.run {
-             DriveSessionManager.shared.speedKPH = 50
+             DriveSessionManager.shared.speedKPH = 80
          }
+         var state = await session.currentState()
+        snapshot.mood = await moodEngine.mood(for: state)
          //let result = try await orchestrator.nextSetlist(for: state, current:nil)
-         //let tracks: [TrackRecord?] = [try await session.fetchNextTrack(mood: snapshot.mood)]
-         //cache = tracks.compactMap { $0 }
+         if cache.isEmpty {
+             let tracks: [TrackRecord?] = [try await session.fetchNextTrack(mood: snapshot.mood)]
+             cache = tracks.compactMap { $0 }
+             print(cache.first?.title)
+         }
         return cache
     }
 

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>spotify</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>drivedj</string>
+			</array>
+		</dict>
+	</array>
+	<key>CYANETE_API_TOKEN</key>
+	<string>$(CYANETE_API_TOKEN)</string>
+	<key>SPOTIFY_CLIENT_ID</key>
+	<string>$(SPOTIFY_CLIENT_ID)</string>
+	<key>SPOTIFY_CLIENT_SECRET</key>
+	<string>$(SPOTIFY_CLIENT_SECRET)</string>
+	<key>SPOTIFY_REDIRECT_URI</key>
+	<string>drivedj://callback</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>CPTemplateApplicationSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>CPTemplateApplicationScene</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).CarPlaySceneDelegate</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+<string>位置情報を使用します</string>
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>spotify</string>
+</array>
+</dict>
+</plist>

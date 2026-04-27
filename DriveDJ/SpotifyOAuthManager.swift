@@ -18,13 +18,24 @@ final class SpotifyOAuthManager: NSObject, ASWebAuthenticationPresentationContex
     private var codeVerifier: String = ""
 
     func currentAccessToken() async throws -> String {
+
         if let token = tokenStore.accessToken, !token.isEmpty {
+            await MainActor.run{
+                DriveDJViewModel.debugText  = token
+            }
             return token
         }
         return try await authorize()
     }
 
     func authorize() async throws -> String {
+        if let dic = Bundle.main.infoDictionary {
+//            await MainActor.run{
+//                DriveDJViewModel.debugText  = dic.reduce(into : "" ){result, item in
+//                    result += "\(item.key): \(item.value)\n"
+//                }
+            //}
+        }
         guard !AppConfig.spotifyClientID.isEmpty, !AppConfig.spotifyRedirectURI.isEmpty else {
             throw SpotifyAuthError.missingConfiguration
         }

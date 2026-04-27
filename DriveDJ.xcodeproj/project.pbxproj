@@ -6,14 +6,36 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CE19EBB12F9F74400065C9E6 /* SpotifyiOS in Frameworks */ = {isa = PBXBuildFile; productRef = CE19EBB02F9F74400065C9E6 /* SpotifyiOS */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		CEE4766D2F9E170900ADFD24 /* DriveDJ.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DriveDJ.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CE19EB9F2F9F08F10065C9E6 /* Exceptions for "DriveDJ" folder in "DriveDJ" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CEE4766C2F9E170900ADFD24 /* DriveDJ */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CEE4766F2F9E170900ADFD24 /* DriveDJ */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CE19EB9F2F9F08F10065C9E6 /* Exceptions for "DriveDJ" folder in "DriveDJ" target */,
+			);
 			path = DriveDJ;
+			sourceTree = "<group>";
+		};
+		CEE476D32F9EFB9100ADFD24 /* Config */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Config;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -23,6 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE19EBB12F9F74400065C9E6 /* SpotifyiOS in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -32,6 +55,7 @@
 		CEE476642F9E170900ADFD24 = {
 			isa = PBXGroup;
 			children = (
+				CEE476D32F9EFB9100ADFD24 /* Config */,
 				CEE4766F2F9E170900ADFD24 /* DriveDJ */,
 				CEE4766E2F9E170900ADFD24 /* Products */,
 			);
@@ -62,9 +86,11 @@
 			);
 			fileSystemSynchronizedGroups = (
 				CEE4766F2F9E170900ADFD24 /* DriveDJ */,
+				CEE476D32F9EFB9100ADFD24 /* Config */,
 			);
 			name = DriveDJ;
 			packageProductDependencies = (
+				CE19EBB02F9F74400065C9E6 /* SpotifyiOS */,
 			);
 			productName = DriveDJ;
 			productReference = CEE4766D2F9E170900ADFD24 /* DriveDJ.app */;
@@ -94,6 +120,9 @@
 			);
 			mainGroup = CEE476642F9E170900ADFD24;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CE19EBAF2F9F74400065C9E6 /* XCRemoteSwiftPackageReference "ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CEE4766E2F9E170900ADFD24 /* Products */;
 			projectDirPath = "";
@@ -127,6 +156,8 @@
 /* Begin XCBuildConfiguration section */
 		CEE476762F9E170B00ADFD24 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = CEE476D32F9EFB9100ADFD24 /* Config */;
+			baseConfigurationReferenceRelativePath = Debug.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -178,6 +209,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_EXPAND_BUILD_SETTINGS = YES;
+				"INFOPLIST_FILE[sdk=*]" = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -191,6 +224,8 @@
 		};
 		CEE476772F9E170B00ADFD24 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = CEE476D32F9EFB9100ADFD24 /* Config */;
+			baseConfigurationReferenceRelativePath = Debug.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -236,6 +271,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_EXPAND_BUILD_SETTINGS = YES;
+				INFOPLIST_FILE = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -248,6 +285,8 @@
 		};
 		CEE476792F9E170B00ADFD24 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = CEE476D32F9EFB9100ADFD24 /* Config */;
+			baseConfigurationReferenceRelativePath = Debug.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -256,17 +295,20 @@
 				DEVELOPMENT_TEAM = K6TS99LSB3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_FILE = DriveDJ/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "音楽を再生するために使用します";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.drivedj.DriveDJ;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.drivedj;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -280,6 +322,8 @@
 		};
 		CEE4767A2F9E170B00ADFD24 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = CEE476D32F9EFB9100ADFD24 /* Config */;
+			baseConfigurationReferenceRelativePath = Debug.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -288,17 +332,20 @@
 				DEVELOPMENT_TEAM = K6TS99LSB3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_FILE = DriveDJ/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "音楽を再生するために使用します";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.drivedj.DriveDJ;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.drivedj;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -320,7 +367,7 @@
 				CEE476772F9E170B00ADFD24 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		CEE476782F9E170B00ADFD24 /* Build configuration list for PBXNativeTarget "DriveDJ" */ = {
 			isa = XCConfigurationList;
@@ -329,9 +376,28 @@
 				CEE4767A2F9E170B00ADFD24 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CE19EBAF2F9F74400065C9E6 /* XCRemoteSwiftPackageReference "ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/spotify/ios-sdk";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CE19EBB02F9F74400065C9E6 /* SpotifyiOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CE19EBAF2F9F74400065C9E6 /* XCRemoteSwiftPackageReference "ios-sdk" */;
+			productName = SpotifyiOS;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CEE476652F9E170900ADFD24 /* Project object */;
 }

@@ -33,6 +33,12 @@ class PlaybackScheduler {
                         ]
 
                         let cache = tracks.compactMap { $0 }
+                        for track in cache{
+                            guard let id = track.spotifyID else { continue }
+                            try await orchestrator.appendQueue(trackID : id)
+                            try await orchestrator.viewModel.addSetList(track:track)
+                            try await orchestrator.playSetlist(for: state, current: track)
+                        }
 
                         print("更新:", cache)
 
@@ -42,7 +48,7 @@ class PlaybackScheduler {
                 }
 
                 // 1分待つ
-                try? await Task.sleep(nanoseconds: 60 * 1_000_000_000)
+                try? await Task.sleep(nanoseconds: 30 * 1_000_000_000)
             }
         }
     }

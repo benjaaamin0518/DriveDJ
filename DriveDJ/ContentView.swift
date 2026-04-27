@@ -8,6 +8,7 @@ struct ContentView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 16) {
+                    debugText
                     statusCard
                     driveControls
                     actionButtons
@@ -24,6 +25,15 @@ struct ContentView: View {
                 viewModel.tick()
             }
         }
+    }
+    private var debugText: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(DriveDJViewModel.debugText)
+                .font(.headline)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20))
     }
 
     private var statusCard: some View {
