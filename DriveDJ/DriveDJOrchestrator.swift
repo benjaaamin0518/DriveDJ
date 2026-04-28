@@ -73,6 +73,7 @@ actor DriveDJOrchestrator {
     }
 
     func playSetlist(for state: DriveState, current: TrackRecord?) async throws -> (DriveMood, [TrackRecord]) {
+        try await start()
         let result = try await nextSetlist(for: state, current: current)
 //        let ids = result.setlist.compactMap(\.spotifyID)
 //
@@ -91,7 +92,9 @@ actor DriveDJOrchestrator {
 //                try await appendQueue(trackID: next)
 //            }
 //        }
-
+        guard let current else {return result}
+        try await viewModel.addSetList(track:current)
+        //try await start()
         return result
     }
 

@@ -54,6 +54,12 @@ final class DriveDJViewModel: ObservableObject {
     }
     
     func addSetList(track:TrackRecord) async throws{
+        if let currentTrack {
+            let index = upcomingTracks.firstIndex(where: {currentTrack.artist == $0.artist && currentTrack.title == $0.title})
+            if let index {
+                upcomingTracks.removeSubrange((index+1)...)
+            }
+        }
         upcomingTracks.append(track)
         snapshot.queueCount = upcomingTracks.count
 

@@ -258,5 +258,141 @@
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "DA035E5C-98C4-4ACB-9E1C-6F8FDABC58CB"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DriveDJ/PlaybackScheduler.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "32"
+            endingLineNumber = "32"
+            landmarkName = "start(orchestrator:session:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "390534E4-AC81-475F-A06B-3E28674BD984"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DriveDJ/PlaybackScheduler.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "21"
+            endingLineNumber = "21"
+            landmarkName = "start(orchestrator:session:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "390534E4-AC81-475F-A06B-3E28674BD984 - 520f87426688a09"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for closure #1 () async -&gt; () in DriveDJ.PlaybackScheduler.start(orchestrator: DriveDJ.DriveDJOrchestrator, session: DriveDJ.DriveSessionManager) -&gt; ()"
+                  moduleName = "DriveDJ.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user/DriveDJ/DriveDJ/PlaybackScheduler.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "21"
+                  endingLineNumber = "21">
+               </Location>
+               <Location
+                  uuid = "390534E4-AC81-475F-A06B-3E28674BD984 - 979806b628c0a449"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(13) suspend resume partial function for closure #1 () async -&gt; () in DriveDJ.PlaybackScheduler.start(orchestrator: DriveDJ.DriveDJOrchestrator, session: DriveDJ.DriveSessionManager) -&gt; ()"
+                  moduleName = "DriveDJ.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user/DriveDJ/DriveDJ/PlaybackScheduler.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "21"
+                  endingLineNumber = "21">
+               </Location>
+               <Location
+                  uuid = "390534E4-AC81-475F-A06B-3E28674BD984 - 8cb82a0ecb509552"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(18) suspend resume partial function for closure #1 () async -&gt; () in DriveDJ.PlaybackScheduler.start(orchestrator: DriveDJ.DriveDJOrchestrator, session: DriveDJ.DriveSessionManager) -&gt; ()"
+                  moduleName = "DriveDJ.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user/DriveDJ/DriveDJ/PlaybackScheduler.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "21"
+                  endingLineNumber = "21">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "BE244F9A-11DA-4408-8D06-7AF791F483A9"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DriveDJ/PlaybackScheduler.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "23"
+            endingLineNumber = "23"
+            landmarkName = "start(orchestrator:session:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "BE244F9A-11DA-4408-8D06-7AF791F483A9 - 520f87426688bcb"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for closure #1 () async -&gt; () in DriveDJ.PlaybackScheduler.start(orchestrator: DriveDJ.DriveDJOrchestrator, session: DriveDJ.DriveSessionManager) -&gt; ()"
+                  moduleName = "DriveDJ.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user/DriveDJ/DriveDJ/PlaybackScheduler.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "23"
+                  endingLineNumber = "23">
+               </Location>
+               <Location
+                  uuid = "BE244F9A-11DA-4408-8D06-7AF791F483A9 - 979806b628c0a58b"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(13) suspend resume partial function for closure #1 () async -&gt; () in DriveDJ.PlaybackScheduler.start(orchestrator: DriveDJ.DriveDJOrchestrator, session: DriveDJ.DriveSessionManager) -&gt; ()"
+                  moduleName = "DriveDJ.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user/DriveDJ/DriveDJ/PlaybackScheduler.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "23"
+                  endingLineNumber = "23">
+               </Location>
+               <Location
+                  uuid = "BE244F9A-11DA-4408-8D06-7AF791F483A9 - 8cb82a0ecb509490"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(18) suspend resume partial function for closure #1 () async -&gt; () in DriveDJ.PlaybackScheduler.start(orchestrator: DriveDJ.DriveDJOrchestrator, session: DriveDJ.DriveSessionManager) -&gt; ()"
+                  moduleName = "DriveDJ.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user/DriveDJ/DriveDJ/PlaybackScheduler.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "23"
+                  endingLineNumber = "23">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
    </Breakpoints>
 </Bucket>
