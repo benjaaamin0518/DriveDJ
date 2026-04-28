@@ -6,7 +6,6 @@ import MusicKit
 @MainActor
 final class DriveSessionManager: NSObject, ObservableObject {
     static let shared = DriveSessionManager()
-
     @Published var speedKPH: Double = 0
     @Published var isNight: Bool = false
     @Published var routeIntensity: Double = 0.25
@@ -238,16 +237,16 @@ final class DriveSessionManager: NSObject, ObservableObject {
         let response = try await request.response()
         return response.songs.first?.id.rawValue
     }
-    func fetchNextTrack(mood: DriveMood) async throws -> TrackRecord? {
+    func fetchNextTrack(mood: DriveMood,orchestrator:DriveDJOrchestrator) async throws -> Song? {
 
-        let spotify = SpotifyWebAPI()
+        //let spotify = SpotifyWebAPI()
 
         let params = targetParams(for: mood)
 
         // とりあえずseed（Oasisとか）
         let seedArtistId = "2DaxqgrOhkeH0fpeiQq2f4" // Oasis
 
-        guard let tracks = try? await spotify.fetchRecommendations(
+        guard let tracks = try? await orchestrator.fetchRecommendations(
             seedArtistId: seedArtistId,
             targetEnergy: params.energy,
             targetTempo: params.tempo
@@ -256,19 +255,20 @@ final class DriveSessionManager: NSObject, ObservableObject {
         }
 
         for item in tracks {
-            let title = item.name
-            let id = item.id
-            let artist = item.artists.first?.name ?? ""
+//            let title = item.name
+//            let id = item.id
+//            let artist = item.artists.first?.name ?? ""
 
             //let appleId = try await findAppleMusicId(title: title, artist: artist)
 
             //if let appleId {
-                return TrackRecord(
-                    title: title,
-                    artist: artist,
-                    spotifyID: id,
-                    tags: [],
-                )
+//                return TrackRecord(
+//                    title: title,
+//                    artist: artist,
+//                    spotifyID: id,
+//                    tags: [],
+//                )
+            return item
             //}
         }
 

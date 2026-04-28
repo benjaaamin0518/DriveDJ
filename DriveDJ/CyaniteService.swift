@@ -3,6 +3,7 @@ import Foundation
 struct CyaniteSearchCandidate: Decodable {
     let id: String
     let title: String
+    
 }
 
 struct CyaniteGraphQLResponse<T: Decodable>: Decodable {

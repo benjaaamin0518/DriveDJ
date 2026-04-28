@@ -25,6 +25,21 @@ actor AppleMusicResolver {
 
         return best ?? response.songs.first
     }
+    func resolveSong(from candidate: CyaniteSearchCandidate) async throws -> Song? {
+        try await requestAuthorization()
+        let query = candidate.title
+        //let query = "omoide in my head"
+        // 例: "The Cat and Owl - Begin the Beguine"
+
+        let request = MusicCatalogSearchRequest(
+            term: query,
+            types: [Song.self]
+        )
+
+        let response = try await request.response()
+        print("songs.count:", response.songs.count)
+        return response.songs.first
+    }
 
     func resolveSongs(records: [TrackRecord]) async throws -> [Song] {
         try await requestAuthorization()

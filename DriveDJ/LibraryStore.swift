@@ -1,10 +1,10 @@
 import Foundation
 import Combine
-
+import MusicKit
 actor LibraryStore {
     private let fileName = "track-library.json"
-    private var cache: [TrackRecord] = []
-    private var snapshot = PlaybackSnapshot()
+    private var cache: [Song] = []
+    //private var snapshot = PlaybackSnapshot()
     private let moodEngine = MoodEngine()
     //private let viewModel = DriveDJViewModel()
     var session = DriveSessionManager.shared
@@ -13,7 +13,7 @@ actor LibraryStore {
         //cache = Self.defaultSeedTracks()
     }
 
-     func  load() async throws -> [TrackRecord] {
+    func load(orchestrator:DriveDJOrchestrator) async throws -> [Song] {
 //        if !cache.isEmpty { return cache }
 //        if let loaded = Self.readFromDisk(fileName: fileName), !loaded.isEmpty {
 //            cache = loaded
@@ -26,34 +26,34 @@ actor LibraryStore {
              DriveSessionManager.shared.speedKPH = 80
          }
          var state = await session.currentState()
-        snapshot.mood = await moodEngine.mood(for: state)
+         let mood = await moodEngine.mood(for: state)
          //let result = try await orchestrator.nextSetlist(for: state, current:nil)
          if cache.isEmpty {
-             let tracks: [TrackRecord?] = [try await session.fetchNextTrack(mood: snapshot.mood)]
+             let tracks: [Song?] = [try await session.fetchNextTrack(mood: mood,orchestrator:orchestrator)]
              cache = tracks.compactMap { $0 }
              print(cache.first?.title)
          }
         return cache
     }
 
-    func save(_ tracks: [TrackRecord]) {
-        cache = tracks
-        Self.writeToDisk(tracks, fileName: fileName)
-    }
+//    func save(_ tracks: [Song]) {
+//        cache = tracks
+//        Self.writeToDisk(tracks, fileName: fileName)
+//    }
 
-    func upsert(_ track: TrackRecord) async throws {
-        var current = try await load()
-        if let idx = current.firstIndex(where: { $0.id == track.id }) {
-            current[idx] = track
-        } else {
-            current.append(track)
-        }
-        save(current)
-    }
+//    func upsert(_ track: TrackRecord) async throws {
+//        var current = try await load()
+//        if let idx = current.firstIndex(where: { $0.id == track.id }) {
+//            current[idx] = track
+//        } else {
+//            current.append(track)
+//        }
+//        save(current)
+//    }
 
-    func replaceAll(_ tracks: [TrackRecord]) {
-        save(tracks)
-    }
+//    func replaceAll(_ tracks: [TrackRecord]) {
+//        save(tracks)
+//    }
 
     private static func defaultSeedTracks() -> [TrackRecord] {
         [

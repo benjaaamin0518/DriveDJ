@@ -1,123 +1,200 @@
 # DriveDJ
 
 ![DriveDJ Logo](./DriveDJ_logo.png)
+DriveDJ は、走行状況に応じて曲のテンションを切り替える iOS / CarPlay 向けの実験アプリです。現在のコードでは、位置情報・速度・時間帯・簡易的な街中判定・WeatherKit の天候情報を使って `DriveMood` を決め、Cyanite で候補曲を探し、Apple Music の楽曲に解決して表示します。
 
-**DriveDJ** は、ドライブの状況に合わせて曲を自動で選ぶ iOS アプリです。  
-「走る場所」「時間帯」「残り時間」などをもとに、今のドライブに合う音楽を流します。
+## 現在の実装範囲
 
-## できること
+現時点で動いている主な流れは以下です。
 
-- 走行状況に合わせてムードを判定
-- Spotify のデータを使って候補曲を広げる
-- Apple Music で再生する
-- 再生中は定期的に次の曲を準備する
-- ドライブの流れに合わせて曲の雰囲気を変える
+1. `DriveSessionManager` が位置情報を監視し、速度、夜間フラグ、ルート強度、街中密度、天候スコアを更新する。
+2. `MoodEngine` が `DriveState` から `CHILL / MID / UP / PEAK / END` のムードを判定する。
+3. `CyaniteService` がムードとテンポ・エネルギー条件から候補曲を検索する。
+4. `AppleMusicResolver` が候補曲名を Apple Music の `Song` に解決する。
+5. `DriveDJViewModel` が SwiftUI 画面と CarPlay 画面に状態を反映する。
 
-## ざっくりした仕組み
+補足です。
 
-```text
-現在地・速度・天気・残り時間
-→ ムード判定
-→ Spotify で候補曲を取得
-→ Apple Music で見つかった曲を再生
-→ 1分おきに次の候補を更新
-```
+- iPhone 側のメイン画面は `ContentView` です。
+- CarPlay 側は `CarPlaySceneDelegate` の `CPListTemplate` で簡易表示しています。
+- `Play Queue` ボタンは `playPreparedSetlist()` を呼びますが、現状コードではプレイバック処理そのものよりも、候補曲取得と状態更新が中心です。
+- `Refresh Setlist` と `Enrich From APIs` は UI 上にありますが、呼び出しはコメントアウトされています。
+- Spotify 関連クラスは残っていますが、現在の主導線は Cyanite + Apple Music です。
 
-## 必要なもの
+## 画面イメージ
 
-- Mac
-- Xcode
-- iPhone 実機
-- Apple Music サブスクリプション
-- Spotify Developer アカウント
-- CarPlay 対応環境（将来的に使用）
+スクリーンショットは `docs/screenshots/` に置く前提です。以下のファイル名で保存すると、そのまま README に表示されます。
+
+### iPhone
+
+`docs/screenshots/iphone-main.png`
+
+![iPhone main screen](docs/screenshots/iphone-main.png)
+
+<!-- ### CarPlay
+
+`docs/screenshots/carplay-main.png`
+
+![CarPlay main screen](docs/screenshots/carplay-main.png) -->
+
+まだ画像がない場合は、上のファイル名で保存するだけで差し替わります。管理ルールは [docs/screenshots/README.md](/Users/user/DriveDJ/docs/screenshots/README.md) にまとめています。
+
+## UI で確認できる内容
+
+`ContentView` では次の情報を確認できます。
+
+- `Now`: 推定ムード、現在曲名、アーティスト名、キュー件数、状態文字列
+- `Drive state`: 取得元、速度、夜間フラグ、ルート強度、街中密度、天候、気温、降水、風速、天候スコア
+- `Trip mins`: 想定ドライブ時間
+- `Elapsed / Remaining`: 経過時間と残り時間
+- `Upcoming`: 次に提案される楽曲一覧
+
+`Start Trip` を押すと `DriveSessionManager` のタイマーと位置情報更新が動き、CarPlay 接続時は `setCarPlayConnected(true)` 経由で同様の流れに入ります。
+
+## アーキテクチャ
+
+主要ファイルの役割は以下です。
+
+- `DriveDJApp.swift`: アプリ起点
+- `ContentView.swift`: iPhone 画面
+- `DriveDJViewModel.swift`: 画面状態の管理
+- `DriveSessionManager.swift`: 位置情報、走行状態、天候状態の集約
+- `MoodEngine.swift`: 走行状態からムードを算出
+- `DriveDJOrchestrator.swift`: 推薦と再生導線のオーケストレーション
+- `LibraryStore.swift`: 候補曲の読み出しと簡易キャッシュ
+- `CyaniteService.swift`: Cyanite GraphQL API 呼び出し
+- `AppleMusicResolver.swift`: 候補曲を Apple Music カタログへ解決
+- `AppleMusicPlaybackService.swift`: Apple Music 再生補助
+- `CarPlaySceneDelegate.swift`: CarPlay 画面
+
+状態モデルは `Models.swift` にまとまっています。
+
+- `DriveState`: ムード判定に使う運転コンテキスト
+- `DriveMood`: `CHILL / MID / UP / PEAK / END`
+- `PlaybackSnapshot`: 画面表示用の簡易状態
+- `TrackRecord`: UI 表示向けの曲情報
+
+## ムード判定ロジック
+
+`MoodEngine` は次の要素を合算してムードを決めます。
+
+- 速度
+- ルート強度
+- 街中密度
+- 天候の厳しさ
+- 夜間かどうか
+- 残り時間が 8 分以下なら `END`
+
+ざっくりした傾向は以下です。
+
+- 低速で穏やかな状況: `CHILL`
+- 普段の街乗り: `MID`
+- 流れが良く、少し上がる状況: `UP`
+- 高速域や刺激が強い状況: `PEAK`
+- 到着間際: `END`
+
+## 推薦フロー
+
+現在の推薦処理は次の構成です。
+
+1. `DriveSessionManager.targetParams(for:)` がムードごとの目標 `energy` と `tempo` を決める。
+2. `CyaniteService.fetchCandidates(...)` が自然文検索で候補を取得する。
+3. `AppleMusicResolver.resolveSong(from:)` が Apple Music の `Song` に変換する。
+4. `DriveDJOrchestrator.nextSetlist(...)` が `TrackRecord` に整形して ViewModel に返す。
+
+実装上の注意です。
+
+- `LibraryStore.load(...)` は現状 1 曲ずつ取得してキャッシュします。
+- デフォルト seed artist は `DriveSessionManager.fetchNextTrack(...)` 内で Oasis に固定されています。
+- Cyanite の decade / style は現在 `1990s` と `rock` 寄りに固定されています。
+
+## 必要な権限と機能
+
+このアプリを動かすには、少なくとも以下が必要です。
+
+- Location When In Use
+- Apple Music 利用許可
+- Background Audio
+- WeatherKit capability
+- CarPlay Audio App に必要な entitlement と scene 設定
+
+現在の `Info.plist` には次の設定が入っています。
+
+- `CFBundleURLSchemes`: `drivedj`
+- `SPOTIFY_CLIENT_ID`
+- `SPOTIFY_CLIENT_SECRET`
+- `SPOTIFY_REDIRECT_URI`
+- `CYANETE_API_TOKEN`
+- `UIBackgroundModes = audio`
+- CarPlay scene (`CPTemplateApplicationScene`)
+- `NSLocationWhenInUseUsageDescription`
+- `LSApplicationQueriesSchemes = spotify`
+
+補助メモは [DriveDJ/DriveDJ/InfoPlist.sample.txt](/Users/user/DriveDJ/DriveDJ/InfoPlist.sample.txt) と [DriveDJ/DriveDJ/PackageNotes.md](/Users/user/DriveDJ/DriveDJ/PackageNotes.md) にあります。
 
 ## セットアップ
 
-### 1. Xcode で新規プロジェクトを作成
-- テンプレートは **iOS App**
-- Interface は **SwiftUI**
-- Language は **Swift**
+### 1. Xcode で開く
 
-### 2. コードを追加
-このリポジトリの Swift ファイルを Xcode プロジェクトに追加します。  
-`@main` を持つアプリファイルが 1 つだけ存在することを確認してください。
+通常どおり `DriveDJ.xcodeproj` を開いて署名設定を行ってください。
 
-### 3. Signing を設定
-- `Signing & Capabilities` で Team を選択
-- `Automatically manage signing` を ON
-- Bundle Identifier を自分専用のものに変更
+### 2. Build Settings / xcconfig
 
-例:
-```text
-com.yourname.drivedj
-```
+`Info.plist` は build setting 展開を使っているので、少なくとも以下の値を供給する必要があります。
 
-### 4. 追加する Capability
-- Apple Music を使うための設定
-- Background Modes の Audio
-- 必要に応じて Location
-- WeatherKit を使うなら WeatherKit
+- `SPOTIFY_CLIENT_ID`
+- `SPOTIFY_CLIENT_SECRET`
+- `CYANETE_API_TOKEN`
 
-### 5. 権限文言を追加
-`Info.plist` に用途説明を入れます。
+現在は [DriveDJ/Config/Debug.xcconfig](/Users/user/DriveDJ/Config/Debug.xcconfig) に定義があります。実運用では、認証情報をコミット済みファイルに直書きしない構成へ移すことを強く推奨します。
 
-例:
-```xml
-<key>NSAppleMusicUsageDescription</key>
-<string>音楽を再生するためにApple Musicへアクセスします</string>
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>走行状況と到着予測を取得するために位置情報を使用します</string>
-```
+### 3. Signing & Capabilities
+
+Xcode で以下を有効にしてください。
+
+- WeatherKit
+- Background Modes > Audio, AirPlay, and Picture in Picture
+- 必要に応じて CarPlay entitlement
+
+### 4. 実機で権限を許可する
+
+初回起動時に以下の許可が必要です。
+
+- 位置情報
+- Apple Music
 
 ## 使い方
 
-1. アプリを起動
-2. 位置情報や再生権限を許可
-3. 目的地や走行状態を入力、または自動取得
-4. アプリがムードを判定
-5. 条件に合う曲が Apple Music で再生される
+1. アプリを起動する。
+2. `Start Trip` を押してドライブセッションを開始する。
+3. 数秒から十数秒ほど待って、位置情報と天候情報を反映させる。
+4. `Now` と `Drive state` で現在の運転コンテキストを確認する。
+5. `Play Queue` を押して候補取得と状態更新を走らせる。
 
-## 曲の選び方
+CarPlay 接続時は、CarPlay 画面に `Mood`、`Now Playing`、`Status` が一覧表示されます。
 
-DriveDJ は、次のような考え方で曲を選びます。
+## 現状の制約
 
-- **CHILL**: 落ち着いた曲
-- **MID**: 普通のテンポの曲
-- **UP**: 少し盛り上がる曲
-- **PEAK**: ドライブが一番気持ちいい時間に合う曲
-- **END**: 到着前に締める曲
+README は今のコードに合わせています。したがって、以下は既知の制約として理解してください。
 
-Spotify の recommendations API を使うことで、seed 曲だけでなく、似た雰囲気の曲も候補に入れられます。
+- Spotify 再生系はコードが残っているものの、UI の主導線としては完成していません。
+- `Refresh Setlist` と `Enrich From APIs` は押しても現状何もしません。
+- `LibraryStore` は一般的なライブラリ管理ではなく、単発の候補取得キャッシュに近い実装です。
+- CarPlay 画面は一覧テンプレートのみで、操作導線は最小限です。
+- `DriveDJViewModel.debugText` や `print` が多く、開発途中のデバッグ出力が残っています。
 
-## 注意点
+## スクリーンショットの追加方法
 
-- Spotify は「候補曲を広げるため」に使います
-- 再生は Apple Music 側で行います
-- 実機の挙動は、シミュレータと少し違うことがあります
-- CarPlay は通常の iPhone 画面より制約が多いです
-- Apple Music に存在しない曲は再生できません
+1. `docs/screenshots/iphone-main.png` に iPhone 画面のスクリーンショットを保存する。
+2. `docs/screenshots/carplay-main.png` に CarPlay 画面のスクリーンショットを保存する。
+3. 別画面を追加したい場合は README に `![説明](docs/screenshots/ファイル名.png)` を追記する。
 
-## 今後の改善案
+PNG 以外を使いたい場合も Markdown のパスを書き換えるだけです。
 
-- 曲候補のローカルキャッシュ
-- 連続再生時の自然な切り替え
-- ドライブログの保存
-- よく聞くアーティストの学習
-- CarPlay 向け UI の整理
+## 今後 README と実装を合わせて更新したいポイント
 
-## 開発メモ
-
-このアプリは、次の 4 つに分けて考えると分かりやすいです。
-
-1. **状態取得**  
-   速度、残り時間、天気、位置情報を取る
-
-2. **ムード判定**  
-   状態から今の気分を決める
-
-3. **曲選定**  
-   Spotify で候補を広げ、Apple Music で再生可能な曲を選ぶ
-
-4. **再生制御**  
-   再生中なら 1 分おきに次の候補を更新する
+- Apple Music 再生導線を UI から実際に呼ぶ
+- Spotify 系導線を残すか削るか整理する
+- セットリストを複数曲前提に組み立てる
+- CarPlay 画面から再取得や再生操作を行えるようにする
+- API キー管理を安全な方法へ移す

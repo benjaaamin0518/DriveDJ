@@ -4,7 +4,7 @@ import Combine
 @MainActor
 final class DriveDJViewModel: ObservableObject {
     @Published var snapshot = PlaybackSnapshot()
-    @Published var library: [TrackRecord] = []
+    //@Published var library: [TrackRecord] = []
     @Published var currentTrack: TrackRecord?
     @Published var upcomingTracks: [TrackRecord] = []
     @Published var isBusy: Bool = false
@@ -17,37 +17,37 @@ final class DriveDJViewModel: ObservableObject {
         isBusy = true
         defer { isBusy = false }
 
-        library = try await orchestrator.bootstrapLibrary()
+        //library = try await orchestrator.bootstrapLibrary()
         session.refreshNightFlag()
         snapshot.status = "Library loaded"
-        snapshot.queueCount = library.count
+        //snapshot.queueCount = library.count
     }
 
-    func enrichLibrary() async {
-        isBusy = true
-        defer { isBusy = false }
-
-        do {
-            library = try await orchestrator.enrichLibrary()
-            snapshot.status = "Library enriched"
-            snapshot.queueCount = library.count
-        } catch {
-            snapshot.status = "Enrichment failed: \(error.localizedDescription)"
-        }
-    }
+//    func enrichLibrary() async {
+//        isBusy = true
+//        defer { isBusy = false }
+//
+//        do {
+//            library = try await orchestrator.enrichLibrary()
+//            snapshot.status = "Library enriched"
+//            snapshot.queueCount = library.count
+//        } catch {
+//            snapshot.status = "Enrichment failed: \(error.localizedDescription)"
+//        }
+//    }
 
     func refreshSetlist() async throws{
         let state = session.currentState()
         let result = try await orchestrator.nextSetlist(for: state, current: currentTrack)
-        snapshot.mood = result.mood
-        upcomingTracks = result.setlist
-        snapshot.queueCount = result.setlist.count
+        snapshot.mood = result.0
+        upcomingTracks = result.1
+        snapshot.queueCount = result.1.count
 
-        if let first = result.setlist.first {
+        if let first = result.1.first {
             currentTrack = first
             snapshot.currentTitle = first.title
             snapshot.currentArtist = first.artist
-            snapshot.status = "Prepared \(result.setlist.count) tracks"
+            snapshot.status = "Prepared \(result.1.count) tracks"
         } else {
             snapshot.status = "No candidate tracks"
         }
@@ -98,6 +98,7 @@ final class DriveDJViewModel: ObservableObject {
     func tick() {
         session.refreshNightFlag()
         snapshot.mood = MoodEngine().mood(for: session.currentState())
+        snapshot.queueCount = upcomingTracks.count
         snapshot.queueCount = upcomingTracks.count
     }
 }

@@ -32,7 +32,7 @@ final class CarPlaySceneDelegate: NSObject, CPTemplateApplicationSceneDelegate {
     }
 
     private func refreshTemplate() async throws {
-        try await viewModel.refreshSetlist()
+        //try await viewModel.refreshSetlist()
         let template = makeRootTemplate()
         try await interfaceController?.setRootTemplate(template, animated: false)
     }
@@ -46,12 +46,12 @@ final class CarPlaySceneDelegate: NSObject, CPTemplateApplicationSceneDelegate {
         let statusItem = CPListItem(text: "Status", detailText: viewModel.snapshot.status)
 
         moodItem.handler = { _, completion in
-            Task { try await self.viewModel.refreshSetlist(); try await self.refreshTemplate() }
+            //Task { try await self.viewModel.refreshSetlist(); try await self.refreshTemplate() }
             completion()
         }
 
         trackItem.handler = { _, completion in
-            Task { try await self.viewModel.playPreparedSetlist(); try await self.refreshTemplate() }
+            //Task { try await self.viewModel.playPreparedSetlist(); try await self.refreshTemplate() }
             completion()
         }
 

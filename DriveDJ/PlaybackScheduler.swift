@@ -28,16 +28,15 @@ class PlaybackScheduler {
                             current: nil
                         )
 
-                        let tracks: [TrackRecord?] = [
-                            try await session.fetchNextTrack(mood: snapshot.mood)
+                        let tracks: [Song?] = [
+                            try await session.fetchNextTrack(mood: snapshot.mood,orchestrator:orchestrator)
                         ]
 
                         let cache = tracks.compactMap { $0 }
                         for track in cache{
-                            guard let id = track.spotifyID else { continue }
-                            try await orchestrator.appendQueue(trackID : id)
-                            try await orchestrator.viewModel.addSetList(track:track)
-                            try await orchestrator.playSetlist(for: state, current: track)
+                            //try await orchestrator.appendQueue(trackID : id)
+                            try await orchestrator.viewModel.addSetList(track:TrackRecord(title:track.title,artist: track.artistName))
+                            try await orchestrator.playSetlist(for: state, current: TrackRecord(title:track.title,artist: track.artistName))
                         }
 
                         print("更新:", cache)

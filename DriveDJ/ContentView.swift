@@ -100,7 +100,7 @@ struct ContentView: View {
         Grid(horizontalSpacing: 12, verticalSpacing: 12) {
             GridRow {
                 Button("Refresh Setlist") {
-                    Task { try? await viewModel.refreshSetlist() }
+                    //Task { try? await viewModel.refreshSetlist() }
                 }
                 .buttonStyle(.borderedProminent)
 
@@ -112,7 +112,7 @@ struct ContentView: View {
 
             GridRow {
                 Button("Enrich From APIs") {
-                    Task { await viewModel.enrichLibrary() }
+                    //Task { await viewModel.enrichLibrary() }
                 }
                 .buttonStyle(.bordered)
 
