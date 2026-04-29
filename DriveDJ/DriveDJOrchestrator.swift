@@ -1,7 +1,6 @@
 import Foundation
 import MusicKit
 actor DriveDJOrchestrator {
-
     private let moodEngine = MoodEngine()
     //private let selector = TrackSelector()
     //private var snapshot = PlaybackSnapshot()
@@ -10,12 +9,15 @@ actor DriveDJOrchestrator {
     //private let queueManager = SpotifyQueueManager()
     //private lazy var playbackAPI = SpotifyPlaybackAPI(orchestrator:self)
     private let player = AppleMusicPlaybackService.shared
+    private let resolver = AppleMusicResolver()
     private let scheduler = PlaybackScheduler()
     public var viewModel:DriveDJViewModel
     private let cyanite = CyaniteService()
     private let session = DriveSessionManager.shared
     private var lastTrackURI: String?
     private var isStarted = false
+    private var recentSongKeys: [String] = []
+    private let recentSongLimit = 40
 
     init(viewModel:DriveDJViewModel) {
         //self.shared = DriveDJOrchestrator(viewModel)
@@ -68,7 +70,7 @@ actor DriveDJOrchestrator {
 
     func nextSetlist(for state: DriveState, current: TrackRecord?, limit: Int = 12) async throws -> (DriveMood, [TrackRecord]) {
         let mood = moodEngine.mood(for: state)
-        let tracks = try await library.load(orchestrator:self)
+        let tracks = try await library.load(orchestrator: self, desiredCount: limit)
         //let items = selector.buildSetlist(mood: mood, currentTrack: current, library: tracks, count: limit)
         return (mood, tracks.map{TrackRecord(title:$0.title, artist:$0.artistName)})
     }
@@ -141,23 +143,90 @@ actor DriveDJOrchestrator {
     func fetchRecommendations(
         seedArtistId: String,
         targetEnergy: Double,
-        targetTempo: Double
+        targetTempo: Double,
+        desiredCount: Int = 8
     ) async throws -> [Song] {
-        let result = try await cyanite.fetchCandidates(targetEnergy:targetEnergy, targetTempo:targetTempo,mood:viewModel.snapshot.mood, decade:CyaniteDecade.s90s,style:TrackStyle.rock, randomOffset: 51)
+        let _ = seedArtistId
         let mood = await viewModel.snapshot.mood
-        await MainActor.run{
-            DriveDJViewModel.debugText = "mood: \(mood)"
+        let upcomingTracks = await viewModel.upcomingTracks
+        let currentTrack = await viewModel.currentTrack
+        var excludedTitles = upcomingTracks.map(\.title)
+        if let currentTrack {
+            excludedTitles.append(currentTrack.title)
         }
-        guard let track = result.first else {return []}
-        await MainActor.run{
-            DriveDJViewModel.debugText = "result: \(track.title)"
+
+        let candidates = try await cyanite.fetchCandidates(
+            targetEnergy: targetEnergy,
+            targetTempo: targetTempo,
+            mood: mood,
+            decade: CyaniteDecade.s90s,
+            style: TrackStyle.rock,
+            excludedTitles: excludedTitles,
+            desiredCount: max(desiredCount * 3, 24)
+        )
+
+        await MainActor.run {
+            DriveDJViewModel.debugText = "mood: \(mood.rawValue) • fetched: \(candidates.count)"
+        }
+
+        var excludedSongKeys = Set(upcomingTracks.map { Self.trackKey(title: $0.title, artist: $0.artist) })
+        if let currentTrack {
+            excludedSongKeys.insert(Self.trackKey(title: currentTrack.title, artist: currentTrack.artist))
+        }
+
+        var songs: [Song] = []
+        var seenKeys = excludedSongKeys.union(recentSongKeys)
+
+        for candidate in candidates {
+            await MainActor.run {
+                DriveDJViewModel.debugText = "title: \(candidate.title) • fetched: \(candidates.count)"
             }
-        let song = try await AppleMusicResolver().resolveSong(from: track)
-        guard let song else{return []}
-        await MainActor.run{
-            DriveDJViewModel.debugText = "result: \(song.title) \(song.artistName)"
+            guard let song = try await resolver.resolveSong(from: candidate) else { continue }
+            let key = Self.trackKey(title: song.title, artist: song.artistName)
+            guard seenKeys.insert(key).inserted else { continue }
+            songs.append(song)
+            if songs.count == desiredCount {
+                break
             }
-        
-        return [song]
+        }
+
+        if songs.isEmpty {
+            seenKeys = excludedSongKeys
+            for candidate in candidates {
+                guard let song = try await resolver.resolveSong(from: candidate) else { continue }
+                let key = Self.trackKey(title: song.title, artist: song.artistName)
+                guard seenKeys.insert(key).inserted else { continue }
+                songs.append(song)
+                if songs.count == desiredCount {
+                    break
+                }
+            }
+        }
+
+        rememberSongs(songs)
+
+        let preview = songs.prefix(3).map { "\($0.title) - \($0.artistName)" }.joined(separator: "\n")
+        await MainActor.run {
+            DriveDJViewModel.debugText = preview.isEmpty ? "No unique songs resolved" : preview
+        }
+
+        return songs
+    }
+
+    private func rememberSongs(_ songs: [Song]) {
+        recentSongKeys.append(contentsOf: songs.map { Self.trackKey(title: $0.title, artist: $0.artistName) })
+        if recentSongKeys.count > recentSongLimit {
+            recentSongKeys.removeFirst(recentSongKeys.count - recentSongLimit)
+        }
+    }
+
+    private static func trackKey(title: String, artist: String) -> String {
+        "\(normalized(title))|\(normalized(artist))"
+    }
+
+    private static func normalized(_ value: String) -> String {
+        value
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
     }
 }

@@ -13,7 +13,7 @@ actor LibraryStore {
         //cache = Self.defaultSeedTracks()
     }
 
-    func load(orchestrator:DriveDJOrchestrator) async throws -> [Song] {
+    func load(orchestrator:DriveDJOrchestrator, desiredCount: Int = 8) async throws -> [Song] {
 //        if !cache.isEmpty { return cache }
 //        if let loaded = Self.readFromDisk(fileName: fileName), !loaded.isEmpty {
 //            cache = loaded
@@ -22,18 +22,24 @@ actor LibraryStore {
         // var orchestrator = DriveDJOrchestrator()
          
          //cache = Self.defaultSeedTracks()
-         await MainActor.run {
-             DriveSessionManager.shared.speedKPH = 80
-         }
-         var state = await session.currentState()
-         let mood = await moodEngine.mood(for: state)
-         //let result = try await orchestrator.nextSetlist(for: state, current:nil)
-         if cache.isEmpty {
-             let tracks: [Song?] = [try await session.fetchNextTrack(mood: mood,orchestrator:orchestrator)]
-             cache = tracks.compactMap { $0 }
-             print(cache.first?.title)
-         }
-        return cache
+        await MainActor.run {
+            if DriveSessionManager.shared.speedKPH == 0 {
+                DriveSessionManager.shared.speedKPH = 80
+            }
+        }
+
+        let state = await session.currentState()
+        let mood = await moodEngine.mood(for: state)
+        let params = await session.targetParams(for: mood)
+        let freshTracks = try await orchestrator.fetchRecommendations(
+            seedArtistId: "2DaxqgrOhkeH0fpeiQq2f4",
+            targetEnergy: params.energy,
+            targetTempo: params.tempo,
+            desiredCount: max(desiredCount, 6)
+        )
+
+        cache = mergeUniqueSongs(freshTracks + cache)
+        return Array(cache.prefix(desiredCount))
     }
 
 //    func save(_ tracks: [Song]) {
@@ -88,6 +94,23 @@ actor LibraryStore {
         let url = fileURL(fileName: fileName)
         guard let data = try? JSONEncoder.pretty.encode(tracks) else { return }
         try? data.write(to: url, options: [.atomic])
+    }
+
+    private func mergeUniqueSongs(_ songs: [Song]) -> [Song] {
+        var seen = Set<String>()
+        return songs.filter { song in
+            seen.insert(Self.songKey(song)).inserted
+        }
+    }
+
+    private static func songKey(_ song: Song) -> String {
+        "\(normalized(song.title))|\(normalized(song.artistName))"
+    }
+
+    private static func normalized(_ value: String) -> String {
+        value
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
     }
 }
 

@@ -38,12 +38,12 @@ final class CarPlaySceneDelegate: NSObject, CPTemplateApplicationSceneDelegate {
     }
 
     private func makeRootTemplate() -> CPTemplate {
-        let moodItem = CPListItem(text: "Mood", detailText: viewModel.snapshot.mood.rawValue)
+        let moodItem = CPListItem(text: "ムード", detailText: viewModel.snapshot.mood.rawValue)
         let trackItem = CPListItem(
-            text: "Now Playing",
+            text: "再生中",
             detailText: "\(viewModel.snapshot.currentTitle) — \(viewModel.snapshot.currentArtist)"
         )
-        let statusItem = CPListItem(text: "Status", detailText: viewModel.snapshot.status)
+        let statusItem = CPListItem(text: "状態", detailText: viewModel.snapshot.status)
 
         moodItem.handler = { _, completion in
             //Task { try await self.viewModel.refreshSetlist(); try await self.refreshTemplate() }

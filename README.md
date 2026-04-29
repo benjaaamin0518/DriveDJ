@@ -3,6 +3,8 @@
 ![DriveDJ Logo](./DriveDJ_logo.png)
 DriveDJ は、走行状況に応じて曲のテンションを切り替える iOS / CarPlay 向けの実験アプリです。現在のコードでは、位置情報・速度・時間帯・簡易的な街中判定・WeatherKit の天候情報を使って `DriveMood` を決め、Cyanite で候補曲を探し、Apple Music の楽曲に解決して表示します。
 
+現在の iPhone UI は、ヒーローカード、半透明パネル、グラデーション背景を使ったダッシュボード型のレイアウトです。運転コンテキスト、現在のムード、候補キューを 1 画面で確認できる構成になっています。
+
 ## 現在の実装範囲
 
 現時点で動いている主な流れは以下です。
@@ -17,8 +19,9 @@ DriveDJ は、走行状況に応じて曲のテンションを切り替える iO
 
 - iPhone 側のメイン画面は `ContentView` です。
 - CarPlay 側は `CarPlaySceneDelegate` の `CPListTemplate` で簡易表示しています。
-- `Play Queue` ボタンは `playPreparedSetlist()` を呼びますが、現状コードではプレイバック処理そのものよりも、候補曲取得と状態更新が中心です。
-- `Refresh Setlist` と `Enrich From APIs` は UI 上にありますが、呼び出しはコメントアウトされています。
+- `Play Queue` ボタンは候補曲の再取得と状態更新の起点です。
+- `Refresh setlist` は現在の走行状態から候補を引き直します。
+- `Enrich APIs` は UI 上にはありますが、現状はプレースホルダーです。
 - Spotify 関連クラスは残っていますが、現在の主導線は Cyanite + Apple Music です。
 
 ## 画面イメージ
@@ -30,6 +33,7 @@ DriveDJ は、走行状況に応じて曲のテンションを切り替える iO
 `docs/screenshots/iphone-main.png`
 
 ![iPhone main screen](docs/screenshots/iphone-main.png)
+![iPhone main screen](docs/screenshots/iphone-main2.png)
 
 <!-- ### CarPlay
 
@@ -43,11 +47,13 @@ DriveDJ は、走行状況に応じて曲のテンションを切り替える iO
 
 `ContentView` では次の情報を確認できます。
 
-- `Now`: 推定ムード、現在曲名、アーティスト名、キュー件数、状態文字列
-- `Drive state`: 取得元、速度、夜間フラグ、ルート強度、街中密度、天候、気温、降水、風速、天候スコア
-- `Trip mins`: 想定ドライブ時間
-- `Elapsed / Remaining`: 経過時間と残り時間
-- `Upcoming`: 次に提案される楽曲一覧
+- Hero card: 現在のムード、ステータス、再生中または先頭候補の曲、取得元、キュー件数
+- Drive state: ルート強度、街中密度、気温、天候スコア、降水量、風速、夜間フラグ
+- Trip length: 想定ドライブ時間のスライダー
+- Elapsed / Remaining: 経過時間と残り時間
+- Controls: `Start trip / Stop trip`、`Play queue`、`Refresh setlist`
+- Upcoming: 次に提案される楽曲一覧
+- Resolver debug: Cyanite / Apple Music 解決の途中経過
 
 `Start Trip` を押すと `DriveSessionManager` のタイマーと位置情報更新が動き、CarPlay 接続時は `setCarPlayConnected(true)` 経由で同様の流れに入ります。
 
@@ -104,9 +110,18 @@ DriveDJ は、走行状況に応じて曲のテンションを切り替える iO
 
 実装上の注意です。
 
-- `LibraryStore.load(...)` は現状 1 曲ずつ取得してキャッシュします。
+- `LibraryStore.load(...)` は毎回複数候補を取得し、既存キャッシュの前に積みます。
 - デフォルト seed artist は `DriveSessionManager.fetchNextTrack(...)` 内で Oasis に固定されています。
 - Cyanite の decade / style は現在 `1990s` と `rock` 寄りに固定されています。
+
+重複回避のため、現在は以下を入れています。
+
+- Cyanite の取得件数を増やして母数を広げる
+- Cyanite 候補をタイトル単位で重複除去する
+- ランダム offset で候補の先頭位置を毎回ずらす
+- 直近に使った Cyanite 候補タイトルを履歴から除外する
+- `upcomingTracks`、現在曲、直近解決済み楽曲と被る Apple Music 曲を除外する
+- 解決後も `title + artist` 単位でユニーク化する
 
 ## 必要な権限と機能
 
@@ -169,7 +184,8 @@ Xcode で以下を有効にしてください。
 2. `Start Trip` を押してドライブセッションを開始する。
 3. 数秒から十数秒ほど待って、位置情報と天候情報を反映させる。
 4. `Now` と `Drive state` で現在の運転コンテキストを確認する。
-5. `Play Queue` を押して候補取得と状態更新を走らせる。
+5. `Refresh setlist` を押すと現在状態で候補を引き直せる。
+6. `Play queue` を押すと重複を避けながら候補取得と状態更新を走らせる。
 
 CarPlay 接続時は、CarPlay 画面に `Mood`、`Now Playing`、`Status` が一覧表示されます。
 
@@ -178,8 +194,8 @@ CarPlay 接続時は、CarPlay 画面に `Mood`、`Now Playing`、`Status` が�
 README は今のコードに合わせています。したがって、以下は既知の制約として理解してください。
 
 - Spotify 再生系はコードが残っているものの、UI の主導線としては完成していません。
-- `Refresh Setlist` と `Enrich From APIs` は押しても現状何もしません。
-- `LibraryStore` は一般的なライブラリ管理ではなく、単発の候補取得キャッシュに近い実装です。
+- `Enrich APIs` は押しても現状何もしません。
+- `LibraryStore` は一般的なライブラリ管理ではなく、推薦結果の短期キャッシュに近い実装です。
 - CarPlay 画面は一覧テンプレートのみで、操作導線は最小限です。
 - `DriveDJViewModel.debugText` や `print` が多く、開発途中のデバッグ出力が残っています。
 

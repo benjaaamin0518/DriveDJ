@@ -42,6 +42,9 @@ enum TrackStyle: CaseIterable {
 
 actor CyaniteService {
     private let accessToken: String
+    private var recentCandidateKeys: [String] = []
+    private let recentCandidateLimit = 60
+    private let maxServerResults = 100
 
     init() {
         self.accessToken = AppConfig.cyaneteApiToken
@@ -53,7 +56,9 @@ actor CyaniteService {
         mood: DriveMood,
         decade: CyaniteDecade? = nil,
         style: TrackStyle = .auto,
-        randomOffset: Int? = nil
+        randomOffset: Int? = nil,
+        excludedTitles: [String] = [],
+        desiredCount: Int = 24
     ) async throws -> [CyaniteSearchCandidate] {
 
         let resolvedStyle = resolveStyle(
@@ -93,11 +98,12 @@ actor CyaniteService {
         }
         """
 
+        let requestedCount = min(max(desiredCount * 4, 60), maxServerResults)
         let body: [String: Any] = [
             "query": query,
             "variables": [
                 "searchText": searchText,
-                "first": 50
+                "first": requestedCount
             ]
         ]
 
@@ -113,13 +119,31 @@ actor CyaniteService {
         }
 
         let decoded = try JSONDecoder().decode(CyaniteGraphQLResponse<FreeTextSearchData>.self, from: data)
-        let candidates = decoded.data.freeTextSearch.edges.map(\.node).shuffled()
+        let candidates = uniqueCandidates(from: decoded.data.freeTextSearch.edges.map(\.node)).shuffled()
 
         guard !candidates.isEmpty else { return [] }
 
-        let offset = randomOffset ?? Int.random(in: 0..<candidates.count)
-        let normalizedOffset = offset % candidates.count
-        let rotated = Array(candidates[normalizedOffset...] + candidates[..<normalizedOffset])
+        let excludedKeys = Set(excludedTitles.map(Self.normalizedKey(for:)))
+        let recentKeys = Set(recentCandidateKeys)
+        var filtered = candidates.filter {
+            let key = Self.normalizedKey(for: $0.title)
+            return !excludedKeys.contains(key) && !recentKeys.contains(key)
+        }
+
+        if filtered.count < desiredCount {
+            filtered = candidates.filter {
+                !excludedKeys.contains(Self.normalizedKey(for: $0.title))
+            }
+        }
+
+        if filtered.isEmpty {
+            filtered = candidates
+        }
+
+        let offset = randomOffset ?? Int.random(in: 0..<filtered.count)
+        let normalizedOffset = offset % filtered.count
+        let rotated = Array(filtered[normalizedOffset...] + filtered[..<normalizedOffset])
+        rememberCandidates(Array(rotated.prefix(min(desiredCount, rotated.count))))
 
         return rotated
     }
@@ -221,5 +245,25 @@ actor CyaniteService {
         ].compactMap { $0 }
 
         return parts.joined(separator: " ")
+    }
+
+    private func uniqueCandidates(from candidates: [CyaniteSearchCandidate]) -> [CyaniteSearchCandidate] {
+        var seen = Set<String>()
+        return candidates.filter { candidate in
+            seen.insert(Self.normalizedKey(for: candidate.title)).inserted
+        }
+    }
+
+    private func rememberCandidates(_ candidates: [CyaniteSearchCandidate]) {
+        recentCandidateKeys.append(contentsOf: candidates.map { Self.normalizedKey(for: $0.title) })
+        if recentCandidateKeys.count > recentCandidateLimit {
+            recentCandidateKeys.removeFirst(recentCandidateKeys.count - recentCandidateLimit)
+        }
+    }
+
+    private static func normalizedKey(for value: String) -> String {
+        value
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
     }
 }

@@ -236,9 +236,9 @@
             filePath = "DriveDJ/CyaniteService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "111"
-            endingLineNumber = "111"
-            landmarkName = "fetchCandidates(targetEnergy:targetTempo:mood:decade:style:randomOffset:)"
+            startingLineNumber = "117"
+            endingLineNumber = "117"
+            landmarkName = "fetchCandidates(targetEnergy:targetTempo:mood:decade:style:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -252,9 +252,9 @@
             filePath = "DriveDJ/CyaniteService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "115"
-            endingLineNumber = "115"
-            landmarkName = "fetchCandidates(targetEnergy:targetTempo:mood:decade:style:randomOffset:)"
+            startingLineNumber = "121"
+            endingLineNumber = "121"
+            landmarkName = "fetchCandidates(targetEnergy:targetTempo:mood:decade:style:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -288,50 +288,6 @@
             endingLineNumber = "21"
             landmarkName = "start(orchestrator:session:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "390534E4-AC81-475F-A06B-3E28674BD984 - 520f87426688a09"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for closure #1 () async -&gt; () in DriveDJ.PlaybackScheduler.start(orchestrator: DriveDJ.DriveDJOrchestrator, session: DriveDJ.DriveSessionManager) -&gt; ()"
-                  moduleName = "DriveDJ.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/user/DriveDJ/DriveDJ/PlaybackScheduler.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "21"
-                  endingLineNumber = "21">
-               </Location>
-               <Location
-                  uuid = "390534E4-AC81-475F-A06B-3E28674BD984 - 956f4ddd21891956"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(14) suspend resume partial function for closure #1 () async -&gt; () in DriveDJ.PlaybackScheduler.start(orchestrator: DriveDJ.DriveDJOrchestrator, session: DriveDJ.DriveSessionManager) -&gt; ()"
-                  moduleName = "DriveDJ.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/user/DriveDJ/DriveDJ/PlaybackScheduler.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "21"
-                  endingLineNumber = "21">
-               </Location>
-               <Location
-                  uuid = "390534E4-AC81-475F-A06B-3E28674BD984 - ef28dd6743f0e34b"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(20) suspend resume partial function for closure #1 () async -&gt; () in DriveDJ.PlaybackScheduler.start(orchestrator: DriveDJ.DriveDJOrchestrator, session: DriveDJ.DriveSessionManager) -&gt; ()"
-                  moduleName = "DriveDJ.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/user/DriveDJ/DriveDJ/PlaybackScheduler.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "21"
-                  endingLineNumber = "21">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -347,6 +303,38 @@
             startingLineNumber = "23"
             endingLineNumber = "23"
             landmarkName = "start(orchestrator:session:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "52F528A5-C990-4B6F-AAB9-9F0BB9626ADE"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DriveDJ/CyaniteService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "126"
+            endingLineNumber = "126"
+            landmarkName = "fetchCandidates(targetEnergy:targetTempo:mood:decade:style:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "8381DC8A-4033-40FD-9F31-21676CCD636B"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DriveDJ/CyaniteService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "177"
+            endingLineNumber = "177"
+            landmarkName = "makeSearchText(targetEnergy:targetTempo:mood:decade:style:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

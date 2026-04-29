@@ -23,7 +23,7 @@ final class DriveDJViewModel: ObservableObject {
 
         //library = try await orchestrator.bootstrapLibrary()
         session.refreshNightFlag()
-        snapshot.status = "Library loaded"
+        snapshot.status = "ライブラリを読み込みました"
         //snapshot.queueCount = library.count
     }
 
@@ -68,9 +68,9 @@ final class DriveDJViewModel: ObservableObject {
             currentTrack = first
             snapshot.currentTitle = first.title
             snapshot.currentArtist = first.artist
-            snapshot.status = "Prepared \(result.1.count) tracks"
+            snapshot.status = "\(result.1.count) 曲を準備しました"
         } else {
-            snapshot.status = "No candidate tracks"
+            snapshot.status = "候補曲が見つかりません"
         }
     }
     
@@ -84,7 +84,7 @@ final class DriveDJViewModel: ObservableObject {
         upcomingTracks.append(track)
         snapshot.queueCount = upcomingTracks.count
 
-        snapshot.status = "Prepared \(snapshot.queueCount) tracks"
+        snapshot.status = "\(snapshot.queueCount) 曲を準備しました"
     }
     func changeCurrentTrack(track:TrackRecord) {
         currentTrack = track
@@ -106,19 +106,19 @@ final class DriveDJViewModel: ObservableObject {
                 snapshot.currentTitle = first.title
                 snapshot.currentArtist = first.artist
             }
-            snapshot.status = "Playing"
+            snapshot.status = "再生中"
         } catch {
-            snapshot.status = "Playback failed: \(error.localizedDescription)"
+            snapshot.status = "再生に失敗しました: \(error.localizedDescription)"
         }
     }
 
     func toggleTrip() {
         if session.isTripRunning {
             session.stopTrip()
-            snapshot.status = "Trip stopped"
+            snapshot.status = "ドライブを終了しました"
         } else {
             session.startTrip()
-            snapshot.status = "Trip started"
+            snapshot.status = "ドライブを開始しました"
         }
     }
 
