@@ -9,6 +9,7 @@ actor DriveDJOrchestrator {
     //private let spotify = SpotifyWebAPI()
     //private let queueManager = SpotifyQueueManager()
     //private lazy var playbackAPI = SpotifyPlaybackAPI(orchestrator:self)
+    private let player = AppleMusicPlaybackService.shared
     private let scheduler = PlaybackScheduler()
     public var viewModel:DriveDJViewModel
     private let cyanite = CyaniteService()
@@ -129,8 +130,9 @@ actor DriveDJOrchestrator {
 //        }
     }
 
-    func appendQueue(trackID: String) async throws {
+    func appendQueue(song:Song) async throws {
         //try await playbackAPI.addToQueue(trackID: trackID)
+        await player.appendQueue(song : song)
     }
 
     private static func normalizeSpotifyTrackID(_ uri: String) -> String {

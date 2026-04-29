@@ -34,7 +34,7 @@ class PlaybackScheduler {
 
                         let cache = tracks.compactMap { $0 }
                         for track in cache{
-                            //try await orchestrator.appendQueue(trackID : id)
+                            try await orchestrator.appendQueue(song:track)
                             try await orchestrator.viewModel.addSetList(track:TrackRecord(title:track.title,artist: track.artistName))
                             try await orchestrator.playSetlist(for: state, current: TrackRecord(title:track.title,artist: track.artistName))
                         }

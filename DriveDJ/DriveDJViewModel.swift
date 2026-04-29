@@ -1,6 +1,6 @@
 import Foundation
 import Combine
-
+import MusicKit
 @MainActor
 final class DriveDJViewModel: ObservableObject {
     @Published var snapshot = PlaybackSnapshot()
@@ -9,10 +9,14 @@ final class DriveDJViewModel: ObservableObject {
     @Published var upcomingTracks: [TrackRecord] = []
     @Published var isBusy: Bool = false
     static var debugText: String = ""
-
+    private var cancellables = Set<AnyCancellable>()
+    private let player = ApplicationMusicPlayer.shared
     var session = DriveSessionManager.shared
 
     private lazy var orchestrator = DriveDJOrchestrator(viewModel:self)
+    init(){
+        observeNowPlaying()
+    }
     func bootstrap() async throws{
         isBusy = true
         defer { isBusy = false }
@@ -35,6 +39,23 @@ final class DriveDJViewModel: ObservableObject {
 //            snapshot.status = "Enrichment failed: \(error.localizedDescription)"
 //        }
 //    }
+    private func observeNowPlaying() {
+        player.state.objectWillChange
+            .sink { [weak self] _ in
+                Task {
+                    await self?.updateCurrentTrack()
+                }
+            }
+            .store(in: &cancellables)
+    }
+
+    private func updateCurrentTrack() async {
+        let entry = player.queue.currentEntry
+        let song = entry?.item as? Song
+        guard let song else {return}
+        self.currentTrack = TrackRecord(title:song.title,artist: song.artistName)
+
+    }
 
     func refreshSetlist() async throws{
         let state = session.currentState()
