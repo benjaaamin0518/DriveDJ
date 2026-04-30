@@ -165,6 +165,23 @@ struct ContentView: View {
             sectionTitle("操作")
 
             VStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("選曲の対象")
+                        .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                        .foregroundStyle(Color(red: 0.24, green: 0.29, blue: 0.33))
+
+                    Picker("選曲の対象", selection: $viewModel.musicOriginPreference) {
+                        ForEach(MusicOriginPreference.allCases) { preference in
+                            Text(preference.displayName)
+                                .font(.system(.caption, design: .rounded, weight: .medium))
+                                .foregroundStyle(Color(red: 0.22, green: 0.26, blue: 0.30))
+                                .tag(preference)
+                                
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
                 actionButton(
                     title: viewModel.session.isTripRunning ? "ドライブ終了" : "ドライブ開始",
                     subtitle: viewModel.session.isTripRunning ? "位置情報に連動した更新を止めます" : "走行状況に応じたセッションを始めます",

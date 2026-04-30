@@ -56,6 +56,7 @@ actor CyaniteService {
         mood: DriveMood,
         decade: CyaniteDecade? = nil,
         style: TrackStyle = .auto,
+        originPreference: MusicOriginPreference = .mixed,
         randomOffset: Int? = nil,
         excludedTitles: [String] = [],
         desiredCount: Int = 24
@@ -72,7 +73,8 @@ actor CyaniteService {
             targetTempo: targetTempo,
             mood: mood.rawValue,
             decade: decade,
-            style: resolvedStyle
+            style: resolvedStyle,
+            originPreference: originPreference
         )
 
         let query = """
@@ -174,7 +176,8 @@ actor CyaniteService {
         targetTempo: Double,
         mood: String,
         decade: CyaniteDecade?,
-        style: TrackStyle
+        style: TrackStyle,
+        originPreference: MusicOriginPreference
     ) -> String {
         let moodWord = mood.lowercased()
 
@@ -236,6 +239,7 @@ actor CyaniteService {
         }
 
         let decadeWord = decade?.searchWord
+        let originWords = originPreference.searchWords
 
         let parts = [
             moodWord,
@@ -244,7 +248,7 @@ actor CyaniteService {
             styleWord,
             decadeWord,
             vocalWord
-        ].compactMap { $0 }
+        ].compactMap { $0 } + originWords
 
         return parts.joined(separator: " ")
     }
@@ -267,5 +271,18 @@ actor CyaniteService {
         value
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+    }
+}
+
+private extension MusicOriginPreference {
+    var searchWords: [String] {
+        switch self {
+        case .japanese:
+            return ["japanese", "j-pop", "j-rock", "japanese artist", "japanese lyrics"]
+        case .western:
+            return ["western", "english", "american", "british", "english lyrics"]
+        case .mixed:
+            return ["japanese or western", "global", "mixed language"]
+        }
     }
 }

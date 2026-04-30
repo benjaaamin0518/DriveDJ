@@ -150,6 +150,7 @@ actor DriveDJOrchestrator {
         let mood = await viewModel.snapshot.mood
         let upcomingTracks = await viewModel.upcomingTracks
         let currentTrack = await viewModel.currentTrack
+        let musicOriginPreference = await viewModel.musicOriginPreference
         var excludedTitles = upcomingTracks.map(\.title)
         if let currentTrack {
             excludedTitles.append(currentTrack.title)
@@ -171,6 +172,7 @@ actor DriveDJOrchestrator {
                 mood: mood,
                 decade: CyaniteDecade.s90s,
                 style: TrackStyle.rock,
+                originPreference: musicOriginPreference,
                 excludedTitles: excludedTitles,
                 desiredCount: batchSize
             )
@@ -204,6 +206,7 @@ actor DriveDJOrchestrator {
                 mood: mood,
                 decade: CyaniteDecade.s90s,
                 style: TrackStyle.rock,
+                originPreference: musicOriginPreference,
                 desiredCount: batchSize
             )
 

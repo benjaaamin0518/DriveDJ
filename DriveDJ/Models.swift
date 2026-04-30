@@ -8,6 +8,25 @@ enum DriveMood: String, CaseIterable, Codable {
     case end = "END"
 }
 
+enum MusicOriginPreference: String, CaseIterable, Codable, Identifiable {
+    case japanese
+    case western
+    case mixed
+
+    var id: Self { self }
+
+    var displayName: String {
+        switch self {
+        case .japanese:
+            return "邦楽"
+        case .western:
+            return "洋楽"
+        case .mixed:
+            return "両方"
+        }
+    }
+}
+
 struct DriveState: Codable, Equatable {
     var speedKPH: Double
     var isNight: Bool
