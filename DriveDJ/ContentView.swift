@@ -131,16 +131,18 @@ struct ContentView: View {
                 Toggle(isOn: $viewModel.session.isNight) {
                     Text("夜間ドライブ")
                         .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                        .foregroundStyle(Color(red: 0.24, green: 0.29, blue: 0.33))
                 }
                 .tint(Color(red: 0.96, green: 0.56, blue: 0.29))
 
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("ドライブ時間")
+                            .foregroundStyle(Color(red: 0.24, green: 0.29, blue: 0.33))
                         Spacer()
                         Text("\(Int(viewModel.session.tripDurationMinutes)) 分")
                             .monospacedDigit()
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color(red: 0.24, green: 0.29, blue: 0.33))
                     }
                     .font(.system(.subheadline, design: .rounded, weight: .semibold))
 
@@ -202,16 +204,17 @@ struct ContentView: View {
                 Spacer()
                 Text("\(viewModel.upcomingTracks.count) 曲")
                     .font(.system(.caption, design: .rounded, weight: .bold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color(red: 0.22, green: 0.26, blue: 0.30))
             }
 
             if viewModel.upcomingTracks.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("まだ候補曲がありません")
                         .font(.system(.headline, design: .rounded, weight: .bold))
+                        .foregroundStyle(Color(red: 0.24, green: 0.29, blue: 0.33))
                     Text("ドライブを開始するか、キュー再生で候補曲を作成してください。")
                         .font(.system(.subheadline, design: .rounded))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color(red: 0.22, green: 0.26, blue: 0.30))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(16)
@@ -231,15 +234,16 @@ struct ContentView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text(track.title)
                                 .font(.system(.headline, design: .serif, weight: .bold))
+                                .foregroundStyle(Color(red: 0.22, green: 0.26, blue: 0.30))
                                 .lineLimit(2)
 
                             Text(track.artist)
                                 .font(.system(.subheadline, design: .rounded, weight: .medium))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color(red: 0.22, green: 0.26, blue: 0.30))
 
                             Text(meta(track))
                                 .font(.system(.caption, design: .rounded, weight: .medium))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color(red: 0.22, green: 0.26, blue: 0.30))
                                 .lineLimit(2)
                         }
                         Spacer()
@@ -326,7 +330,7 @@ struct ContentView: View {
 
             Text(title)
                 .font(.system(.caption, design: .rounded, weight: .semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color(red: 0.24, green: 0.29, blue: 0.33))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
@@ -337,6 +341,7 @@ struct ContentView: View {
         HStack {
             Text(title)
                 .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                .foregroundStyle(Color(red: 0.24, green: 0.29, blue: 0.33))
             Spacer()
             Text(value)
                 .monospacedDigit()
@@ -349,7 +354,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.system(.caption, design: .rounded, weight: .bold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color(red: 0.24, green: 0.29, blue: 0.33))
             Text(value)
                 .font(.system(.headline, design: .rounded, weight: .black))
                 .monospacedDigit()
