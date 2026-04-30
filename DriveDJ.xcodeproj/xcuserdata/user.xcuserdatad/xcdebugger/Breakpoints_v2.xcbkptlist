@@ -32,7 +32,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "30"
             endingLineNumber = "30"
-            landmarkName = "load(orchestrator:)"
+            landmarkName = "load(orchestrator:desiredCount:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -238,7 +238,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "117"
             endingLineNumber = "117"
-            landmarkName = "fetchCandidates(targetEnergy:targetTempo:mood:decade:style:)"
+            landmarkName = "fetchCandidates(targetEnergy:targetTempo:mood:decade:style:randomOffset:excludedTitles:desiredCount:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -254,7 +254,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "121"
             endingLineNumber = "121"
-            landmarkName = "fetchCandidates(targetEnergy:targetTempo:mood:decade:style:)"
+            landmarkName = "fetchCandidates(targetEnergy:targetTempo:mood:decade:style:randomOffset:excludedTitles:desiredCount:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -316,9 +316,9 @@
             filePath = "DriveDJ/CyaniteService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "126"
-            endingLineNumber = "126"
-            landmarkName = "fetchCandidates(targetEnergy:targetTempo:mood:decade:style:)"
+            startingLineNumber = "128"
+            endingLineNumber = "128"
+            landmarkName = "fetchCandidates(targetEnergy:targetTempo:mood:decade:style:randomOffset:excludedTitles:desiredCount:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -332,9 +332,25 @@
             filePath = "DriveDJ/CyaniteService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "177"
-            endingLineNumber = "177"
+            startingLineNumber = "179"
+            endingLineNumber = "179"
             landmarkName = "makeSearchText(targetEnergy:targetTempo:mood:decade:style:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "C050BCCF-2444-443B-BF01-8152627A5EF1"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DriveDJ/CyaniteService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "122"
+            endingLineNumber = "122"
+            landmarkName = "fetchCandidates(targetEnergy:targetTempo:mood:decade:style:randomOffset:excludedTitles:desiredCount:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

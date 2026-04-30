@@ -17,7 +17,7 @@ actor DriveDJOrchestrator {
     private var lastTrackURI: String?
     private var isStarted = false
     private var recentSongKeys: [String] = []
-    private let recentSongLimit = 40
+    private let recentSongLimit = 80
 
     init(viewModel:DriveDJViewModel) {
         //self.shared = DriveDJOrchestrator(viewModel)
@@ -155,20 +155,6 @@ actor DriveDJOrchestrator {
             excludedTitles.append(currentTrack.title)
         }
 
-        let candidates = try await cyanite.fetchCandidates(
-            targetEnergy: targetEnergy,
-            targetTempo: targetTempo,
-            mood: mood,
-            decade: CyaniteDecade.s90s,
-            style: TrackStyle.rock,
-            excludedTitles: excludedTitles,
-            desiredCount: max(desiredCount * 3, 24)
-        )
-
-        await MainActor.run {
-            DriveDJViewModel.debugText = "mood: \(mood.rawValue) • fetched: \(candidates.count)"
-        }
-
         var excludedSongKeys = Set(upcomingTracks.map { Self.trackKey(title: $0.title, artist: $0.artist) })
         if let currentTrack {
             excludedSongKeys.insert(Self.trackKey(title: currentTrack.title, artist: currentTrack.artist))
@@ -176,25 +162,55 @@ actor DriveDJOrchestrator {
 
         var songs: [Song] = []
         var seenKeys = excludedSongKeys.union(recentSongKeys)
+        let batchSize = max(desiredCount * 4, 24)
 
-        for candidate in candidates {
-            await MainActor.run {
-                DriveDJViewModel.debugText = "title: \(candidate.title) • fetched: \(candidates.count)"
+        for attempt in 0..<3 {
+            let candidates = try await cyanite.fetchCandidates(
+                targetEnergy: targetEnergy,
+                targetTempo: targetTempo,
+                mood: mood,
+                decade: CyaniteDecade.s90s,
+                style: TrackStyle.rock,
+                excludedTitles: excludedTitles,
+                desiredCount: batchSize
+            )
+
+
+            for candidate in candidates {
+                await MainActor.run {
+                    DriveDJViewModel.debugText = "title: \(candidate.title) • fetched: \(candidates.count)"
+                }
+
+                guard let song = try await resolver.resolveSong(from: candidate) else { continue }
+                let key = Self.songKey(song)
+                guard seenKeys.insert(key).inserted else { continue }
+                songs.append(song)
+                excludedTitles.append(song.title)
+
+                if songs.count == desiredCount {
+                    break
+                }
             }
-            guard let song = try await resolver.resolveSong(from: candidate) else { continue }
-            let key = Self.trackKey(title: song.title, artist: song.artistName)
-            guard seenKeys.insert(key).inserted else { continue }
-            songs.append(song)
+
             if songs.count == desiredCount {
                 break
             }
         }
 
         if songs.isEmpty {
+            let fallbackCandidates = try await cyanite.fetchCandidates(
+                targetEnergy: targetEnergy,
+                targetTempo: targetTempo,
+                mood: mood,
+                decade: CyaniteDecade.s90s,
+                style: TrackStyle.rock,
+                desiredCount: batchSize
+            )
+
             seenKeys = excludedSongKeys
-            for candidate in candidates {
+            for candidate in fallbackCandidates {
                 guard let song = try await resolver.resolveSong(from: candidate) else { continue }
-                let key = Self.trackKey(title: song.title, artist: song.artistName)
+                let key = Self.songKey(song)
                 guard seenKeys.insert(key).inserted else { continue }
                 songs.append(song)
                 if songs.count == desiredCount {
@@ -214,10 +230,14 @@ actor DriveDJOrchestrator {
     }
 
     private func rememberSongs(_ songs: [Song]) {
-        recentSongKeys.append(contentsOf: songs.map { Self.trackKey(title: $0.title, artist: $0.artistName) })
+        recentSongKeys.append(contentsOf: songs.map(Self.songKey))
         if recentSongKeys.count > recentSongLimit {
             recentSongKeys.removeFirst(recentSongKeys.count - recentSongLimit)
         }
+    }
+
+    private static func songKey(_ song: Song) -> String {
+        "\(song.id.rawValue)|\(trackKey(title: song.title, artist: song.artistName))"
     }
 
     private static func trackKey(title: String, artist: String) -> String {

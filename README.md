@@ -3,7 +3,7 @@
 ![DriveDJ Logo](./DriveDJ_logo.png)
 DriveDJ は、走行状況に応じて曲のテンションを切り替える iOS / CarPlay 向けの実験アプリです。現在のコードでは、位置情報・速度・時間帯・簡易的な街中判定・WeatherKit の天候情報を使って `DriveMood` を決め、Cyanite で候補曲を探し、Apple Music の楽曲に解決して表示します。
 
-現在の iPhone UI は、ヒーローカード、半透明パネル、グラデーション背景を使ったダッシュボード型のレイアウトです。運転コンテキスト、現在のムード、候補キューを 1 画面で確認できる構成になっています。
+現在の iPhone UI は、日本語表示のダッシュボード型レイアウトです。上部にヒーローカード、その下にドライブ状態、操作、次に流す曲、解決ログが並び、運転コンテキストと候補キューを 1 画面で確認できます。
 
 ## 現在の実装範囲
 
@@ -19,9 +19,9 @@ DriveDJ は、走行状況に応じて曲のテンションを切り替える iO
 
 - iPhone 側のメイン画面は `ContentView` です。
 - CarPlay 側は `CarPlaySceneDelegate` の `CPListTemplate` で簡易表示しています。
-- `Play Queue` ボタンは候補曲の再取得と状態更新の起点です。
-- `Refresh setlist` は現在の走行状態から候補を引き直します。
-- `Enrich APIs` は UI 上にはありますが、現状はプレースホルダーです。
+- `キューを再生` ボタンは候補曲の再取得と状態更新の起点です。
+- `候補を更新` は現在の走行状態から候補を引き直します。
+- `API補完` は UI 上にはありますが、現状はプレースホルダーです。
 - Spotify 関連クラスは残っていますが、現在の主導線は Cyanite + Apple Music です。
 
 ## 画面イメージ
@@ -47,15 +47,15 @@ DriveDJ は、走行状況に応じて曲のテンションを切り替える iO
 
 `ContentView` では次の情報を確認できます。
 
-- Hero card: 現在のムード、ステータス、再生中または先頭候補の曲、取得元、キュー件数
-- Drive state: ルート強度、街中密度、気温、天候スコア、降水量、風速、夜間フラグ
-- Trip length: 想定ドライブ時間のスライダー
-- Elapsed / Remaining: 経過時間と残り時間
-- Controls: `Start trip / Stop trip`、`Play queue`、`Refresh setlist`
-- Upcoming: 次に提案される楽曲一覧
-- Resolver debug: Cyanite / Apple Music 解決の途中経過
+- `ドライブに合わせて選曲`: 現在のムード、ステータス、現在曲、再生元、キュー件数
+- `ドライブ状態`: ルート強度、街中密度、気温、天候スコア、降水量、風速、夜間ドライブ設定
+- `ドライブ時間`: 想定ドライブ時間のスライダー
+- `経過 / 残り`: 経過時間と残り時間
+- `操作`: `ドライブ開始 / ドライブ終了`、`キューを再生`、`候補を更新`
+- `次に流す曲`: 次に提案される楽曲一覧
+- `解決ログ`: Cyanite / Apple Music 解決の途中経過
 
-`Start Trip` を押すと `DriveSessionManager` のタイマーと位置情報更新が動き、CarPlay 接続時は `setCarPlayConnected(true)` 経由で同様の流れに入ります。
+`ドライブ開始` を押すと `DriveSessionManager` のタイマーと位置情報更新が動き、CarPlay 接続時は `setCarPlayConnected(true)` 経由で同様の流れに入ります。
 
 ## アーキテクチャ
 
@@ -120,8 +120,49 @@ DriveDJ は、走行状況に応じて曲のテンションを切り替える iO
 - Cyanite 候補をタイトル単位で重複除去する
 - ランダム offset で候補の先頭位置を毎回ずらす
 - 直近に使った Cyanite 候補タイトルを履歴から除外する
+- Apple Music 検索件数を増やし、完全一致タイトルを優先して解決する
 - `upcomingTracks`、現在曲、直近解決済み楽曲と被る Apple Music 曲を除外する
-- 解決後も `title + artist` 単位でユニーク化する
+- 解決後は `Song.id + title + artist` 単位でユニーク化する
+- 候補が足りない場合は複数パスで再取得して埋める
+
+### 重複回避の詳細
+
+重複を避ける処理は 1 箇所ではなく、複数段で入っています。流れとしては次の順です。
+
+1. `DriveDJOrchestrator.fetchRecommendations(...)` が、まず現在の `upcomingTracks` と `currentTrack` から除外対象のタイトル一覧を作る。
+2. このタイトル一覧を `CyaniteService.fetchCandidates(...)` に渡し、Cyanite 側の候補取得時点で最近使ったタイトルや現在キューにあるタイトルを落とす。
+3. `CyaniteService` では `desiredCount` より多めに候補を取得し、タイトルの正規化比較で重複候補を削る。
+4. その上でランダム `offset` を使って候補の先頭位置をずらし、毎回同じ並び順から取り始めないようにする。
+5. `DriveDJOrchestrator` 側では、Cyanite 候補を 1 件ずつ Apple Music の `Song` に解決する。
+6. Apple Music に解決した後は、`Song.id + title + artist` で作ったキーを使って重複判定する。
+7. ここで比較している対象は、現在の `upcomingTracks`、現在曲、直近に採用した曲の履歴 `recentSongKeys` を合わせた集合。
+8. まだ必要曲数に足りなければ、Cyanite を最大 3 パス取り直して、同じルールで追加候補を埋める。
+9. 最後に採用した `Song` は `rememberSongs(...)` で履歴に保存し、次回以降の選曲で除外対象になる。
+
+コード上で見ると、責務は次のように分かれています。
+
+- `CyaniteService.fetchCandidates(...)`
+  - 候補件数の拡大
+  - タイトル単位の重複除去
+  - ランダム offset
+  - 直近候補タイトルの除外
+- `AppleMusicResolver.resolveSong(from:)`
+  - Apple Music 検索件数を 25 件まで増やす
+  - 完全一致タイトルを優先
+  - それが無ければ部分一致タイトルを優先
+- `DriveDJOrchestrator.fetchRecommendations(...)`
+  - 現在曲と upcoming の除外
+  - `Song.id + title + artist` ベースの最終重複判定
+  - 複数パス再取得
+  - 直近採用履歴の保存
+- `LibraryStore.load(...)`
+  - 新しく取れた曲とキャッシュをマージしつつ、同じ `Song.id + title + artist` キーで再度ユニーク化
+
+実装上のポイントです。
+
+- `title + artist` だけだと別バージョンや解決先の揺れを拾い切れないため、現在は `Song.id` もキーに入れています。
+- それでも完全に 0% の重複を保証するわけではありません。理由は、Cyanite の候補タイトルと Apple Music の解決結果が毎回完全に一対一とは限らないためです。
+- ただし、現状では「候補取得前」「候補取得後」「Apple Music 解決後」「キャッシュ保存時」の 4 段で重複除外しているため、単純なランダム選曲よりはかなり重複しにくい構成になっています。
 
 ## 必要な権限と機能
 
@@ -181,20 +222,20 @@ Xcode で以下を有効にしてください。
 ## 使い方
 
 1. アプリを起動する。
-2. `Start Trip` を押してドライブセッションを開始する。
+2. `ドライブ開始` を押してドライブセッションを開始する。
 3. 数秒から十数秒ほど待って、位置情報と天候情報を反映させる。
-4. `Now` と `Drive state` で現在の運転コンテキストを確認する。
-5. `Refresh setlist` を押すと現在状態で候補を引き直せる。
-6. `Play queue` を押すと重複を避けながら候補取得と状態更新を走らせる。
+4. `ドライブ状態` と上部カードで現在の運転コンテキストを確認する。
+5. `候補を更新` を押すと現在状態で候補を引き直せる。
+6. `キューを再生` を押すと重複を避けながら候補取得と状態更新を走らせる。
 
-CarPlay 接続時は、CarPlay 画面に `Mood`、`Now Playing`、`Status` が一覧表示されます。
+CarPlay 接続時は、CarPlay 画面に `ムード`、`再生中`、`状態` が一覧表示されます。
 
 ## 現状の制約
 
 README は今のコードに合わせています。したがって、以下は既知の制約として理解してください。
 
 - Spotify 再生系はコードが残っているものの、UI の主導線としては完成していません。
-- `Enrich APIs` は押しても現状何もしません。
+- `API補完` は押しても現状何もしません。
 - `LibraryStore` は一般的なライブラリ管理ではなく、推薦結果の短期キャッシュに近い実装です。
 - CarPlay 画面は一覧テンプレートのみで、操作導線は最小限です。
 - `DriveDJViewModel.debugText` や `print` が多く、開発途中のデバッグ出力が残っています。

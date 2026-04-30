@@ -104,7 +104,7 @@ actor LibraryStore {
     }
 
     private static func songKey(_ song: Song) -> String {
-        "\(normalized(song.title))|\(normalized(song.artistName))"
+        "\(song.id.rawValue)|\(normalized(song.title))|\(normalized(song.artistName))"
     }
 
     private static func normalized(_ value: String) -> String {

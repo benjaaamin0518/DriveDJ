@@ -28,16 +28,31 @@ actor AppleMusicResolver {
     func resolveSong(from candidate: CyaniteSearchCandidate) async throws -> Song? {
         try await requestAuthorization()
         let query = candidate.title
-        //let query = "omoide in my head"
-        // 例: "The Cat and Owl - Begin the Beguine"
 
-        let request = MusicCatalogSearchRequest(
+        var request = MusicCatalogSearchRequest(
             term: query,
             types: [Song.self]
         )
+        request.limit = 25
 
         let response = try await request.response()
-        print("songs.count:", response.songs.count)
+        let normalizedQuery = Self.normalized(query)
+
+        let exactMatch = response.songs.first { song in
+            Self.normalized(song.title) == normalizedQuery
+        }
+        if let exactMatch {
+            return exactMatch
+        }
+
+        let containsMatch = response.songs.first { song in
+            let title = Self.normalized(song.title)
+            return title.contains(normalizedQuery) || normalizedQuery.contains(title)
+        }
+        if let containsMatch {
+            return containsMatch
+        }
+
         return response.songs.first
     }
 
@@ -51,6 +66,14 @@ actor AppleMusicResolver {
             }
         }
         return results
+    }
+}
+
+private extension AppleMusicResolver {
+    static func normalized(_ value: String) -> String {
+        value
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
     }
 }
 

@@ -119,9 +119,11 @@ actor CyaniteService {
         }
 
         let decoded = try JSONDecoder().decode(CyaniteGraphQLResponse<FreeTextSearchData>.self, from: data)
+        print(decoded.data.freeTextSearch.edges.map(\.node).first?.title, requestedCount)
         let candidates = uniqueCandidates(from: decoded.data.freeTextSearch.edges.map(\.node)).shuffled()
 
         guard !candidates.isEmpty else { return [] }
+
 
         let excludedKeys = Set(excludedTitles.map(Self.normalizedKey(for:)))
         let recentKeys = Set(recentCandidateKeys)
