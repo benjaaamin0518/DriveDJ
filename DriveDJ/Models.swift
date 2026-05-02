@@ -27,6 +27,101 @@ enum MusicOriginPreference: String, CaseIterable, Codable, Identifiable {
     }
 }
 
+enum MusicStylePreference: String, CaseIterable, Codable, Identifiable {
+    case auto
+    case rock
+    case ballad
+    case mixed
+    case anison
+    case cityPop
+
+    var id: Self { self }
+
+    var displayName: String {
+        switch self {
+        case .auto:
+            return "自動"
+        case .rock:
+            return "ロック"
+        case .ballad:
+            return "バラード"
+        case .mixed:
+            return "ミックス"
+        case .anison:
+            return "アニソン"
+        case .cityPop:
+            return "CityPop"
+        }
+    }
+
+    var cyaniteStyle: TrackStyle {
+        switch self {
+        case .auto:
+            return .auto
+        case .rock:
+            return .rock
+        case .ballad:
+            return .ballad
+        case .mixed:
+            return .mixed
+        case .anison:
+            return .anison
+        case .cityPop:
+            return .cityPop
+        }
+    }
+}
+
+enum MusicDecadePreference: String, CaseIterable, Codable, Identifiable {
+    case all
+    case s70s
+    case s80s
+    case s90s
+    case s2000s
+    case s2010s
+    case s2020s
+
+    var id: Self { self }
+
+    var displayName: String {
+        switch self {
+        case .all:
+            return "すべて"
+        case .s70s:
+            return "70年代"
+        case .s80s:
+            return "80年代"
+        case .s90s:
+            return "90年代"
+        case .s2000s:
+            return "2000年代"
+        case .s2010s:
+            return "2010年代"
+        case .s2020s:
+            return "2020年代"
+        }
+    }
+
+    var cyaniteDecade: CyaniteDecade? {
+        switch self {
+        case .all:
+            return nil
+        case .s70s:
+            return .s70s
+        case .s80s:
+            return .s80s
+        case .s90s:
+            return .s90s
+        case .s2000s:
+            return .s2000s
+        case .s2010s:
+            return .s2010s
+        case .s2020s:
+            return .s2020s
+        }
+    }
+}
+
 struct DriveState: Codable, Equatable {
     var speedKPH: Double
     var isNight: Bool

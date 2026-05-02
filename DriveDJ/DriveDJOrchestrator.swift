@@ -151,6 +151,8 @@ actor DriveDJOrchestrator {
         let upcomingTracks = await viewModel.upcomingTracks
         let currentTrack = await viewModel.currentTrack
         let musicOriginPreference = await viewModel.musicOriginPreference
+        let musicStylePreference = await viewModel.musicStylePreference
+        let musicDecadePreference = await viewModel.musicDecadePreference
         var excludedTitles = upcomingTracks.map(\.title)
         if let currentTrack {
             excludedTitles.append(currentTrack.title)
@@ -165,13 +167,13 @@ actor DriveDJOrchestrator {
         var seenKeys = excludedSongKeys.union(recentSongKeys)
         let batchSize = max(desiredCount * 4, 24)
 
-        for attempt in 0..<3 {
+        for _ in 0..<3 {
             let candidates = try await cyanite.fetchCandidates(
                 targetEnergy: targetEnergy,
                 targetTempo: targetTempo,
                 mood: mood,
-                decade: CyaniteDecade.s90s,
-                style: TrackStyle.rock,
+                decade: musicDecadePreference.cyaniteDecade,
+                style: musicStylePreference.cyaniteStyle,
                 originPreference: musicOriginPreference,
                 excludedTitles: excludedTitles,
                 desiredCount: batchSize
@@ -204,8 +206,8 @@ actor DriveDJOrchestrator {
                 targetEnergy: targetEnergy,
                 targetTempo: targetTempo,
                 mood: mood,
-                decade: CyaniteDecade.s90s,
-                style: TrackStyle.rock,
+                decade: musicDecadePreference.cyaniteDecade,
+                style: musicStylePreference.cyaniteStyle,
                 originPreference: musicOriginPreference,
                 desiredCount: batchSize
             )

@@ -169,17 +169,56 @@ struct ContentView: View {
                     Text("選曲の対象")
                         .font(.system(.subheadline, design: .rounded, weight: .semibold))
                         .foregroundStyle(Color(red: 0.24, green: 0.29, blue: 0.33))
-
-                    Picker("選曲の対象", selection: $viewModel.musicOriginPreference) {
-                        ForEach(MusicOriginPreference.allCases) { preference in
-                            Text(preference.displayName)
-                                .font(.system(.caption, design: .rounded, weight: .medium))
-                                .foregroundStyle(Color(red: 0.22, green: 0.26, blue: 0.30))
-                                .tag(preference)
-                                
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(MusicOriginPreference.allCases) { preference in
+                                selectionChip(
+                                    title: preference.displayName,
+                                    isSelected: viewModel.musicOriginPreference == preference
+                                ) {
+                                    viewModel.musicOriginPreference = preference
+                                }
+                            }
                         }
                     }
-                    .pickerStyle(.segmented)
+                }
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("曲調")
+                        .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                        .foregroundStyle(Color(red: 0.24, green: 0.29, blue: 0.33))
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(MusicStylePreference.allCases) { preference in
+                                selectionChip(
+                                    title: preference.displayName,
+                                    isSelected: viewModel.musicStylePreference == preference
+                                ) {
+                                    viewModel.musicStylePreference = preference
+                                }
+                            }
+                        }
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("年代")
+                        .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                        .foregroundStyle(Color(red: 0.24, green: 0.29, blue: 0.33))
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(MusicDecadePreference.allCases) { preference in
+                                selectionChip(
+                                    title: preference.displayName,
+                                    isSelected: viewModel.musicDecadePreference == preference
+                                ) {
+                                    viewModel.musicDecadePreference = preference
+                                }
+                            }
+                        }
+                    }
                 }
 
                 actionButton(
@@ -418,6 +457,30 @@ struct ContentView: View {
             }
             .padding(16)
             .background(Color.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func selectionChip(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(.caption, design: .rounded, weight: .bold))
+                .foregroundStyle(isSelected ? .white : Color(red: 0.22, green: 0.26, blue: 0.30))
+                .padding(.vertical, 10)
+                .padding(.horizontal, 14)
+                .background(
+                    isSelected
+                    ? Color(red: 0.18, green: 0.53, blue: 0.60)
+                    : Color.black.opacity(0.05),
+                    in: Capsule()
+                )
+                .overlay(
+                    Capsule()
+                        .strokeBorder(
+                            isSelected ? Color.clear : Color.black.opacity(0.06),
+                            lineWidth: 1
+                        )
+                )
         }
         .buttonStyle(.plain)
     }

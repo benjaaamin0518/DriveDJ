@@ -9,6 +9,8 @@ final class DriveDJViewModel: ObservableObject {
     @Published var upcomingTracks: [TrackRecord] = []
     @Published var isBusy: Bool = false
     @Published var musicOriginPreference: MusicOriginPreference = .mixed
+    @Published var musicStylePreference: MusicStylePreference = .auto
+    @Published var musicDecadePreference: MusicDecadePreference = .s90s
     static var debugText: String = ""
     private var cancellables = Set<AnyCancellable>()
     private let player = ApplicationMusicPlayer.shared

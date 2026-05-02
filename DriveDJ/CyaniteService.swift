@@ -38,6 +38,8 @@ enum TrackStyle: CaseIterable {
     case rock
     case ballad
     case mixed
+    case anison
+    case cityPop
 }
 
 actor CyaniteService {
@@ -119,7 +121,7 @@ actor CyaniteService {
         guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
             throw URLError(.badServerResponse)
         }
-
+        print(String(data: data, encoding: .utf8) ?? "")
         let decoded = try JSONDecoder().decode(CyaniteGraphQLResponse<FreeTextSearchData>.self, from: data)
         print(decoded.data.freeTextSearch.edges.map(\.node).first?.title, requestedCount)
         let candidates = uniqueCandidates(from: decoded.data.freeTextSearch.edges.map(\.node)).shuffled()
@@ -233,6 +235,22 @@ actor CyaniteService {
                 "music",
                 "driving song",
                 "road trip song"
+            ].randomElement()!
+        case .anison:
+            styleWord = [
+                "anime song",
+                "anison",
+                "anime opening",
+                "anime ending",
+                "japanese anime soundtrack"
+            ].randomElement()!
+        case .cityPop:
+            styleWord = [
+                "city pop",
+                "japanese city pop",
+                "80s city pop",
+                "urban pop",
+                "retro japanese pop"
             ].randomElement()!
         case .auto:
             styleWord = "song"
